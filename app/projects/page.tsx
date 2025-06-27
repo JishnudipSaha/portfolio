@@ -52,10 +52,10 @@ export default function ProjectsPage() {
       title: "Portfolio Website",
       description: "A responsive portfolio website with smooth animations and modern design.",
       image: "./under_construction_pic.jpg?height=300&width=500",
-      technologies: ["Next.js", "Tailwind CSS", "Framer Motion"],
+      technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"],
       category: "web",
-      github: "https://github.com",
-      live: "",
+      github: "https://github.com/JishnudipSaha/portfolio",
+      live: "https://jishnudip-saha-portfolio-website.vercel.app/",
       featured: true,
     },
     {
