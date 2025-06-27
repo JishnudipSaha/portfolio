@@ -51,7 +51,7 @@ export default function ProjectsPage() {
       id: 2,
       title: "Portfolio Website",
       description: "A responsive portfolio website with smooth animations and modern design.",
-      image: "./under_construction_pic.jpg?height=300&width=500",
+      image: "./placeholder-user.jpg?height=300&width=500",
       technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"],
       category: "web",
       github: "https://github.com/JishnudipSaha/portfolio",
