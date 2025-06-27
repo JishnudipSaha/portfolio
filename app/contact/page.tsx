@@ -275,7 +275,7 @@ export default function ContactPage() {
                 variant="outline"
                 className="neon-button-outline border-2 border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-3 text-lg font-semibold transition-all duration-300 hover:scale-105"
               >
-                <a href="https://linkedin.com/in/jishnudip" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.linkedin.com/in/jishnudipsaha/" target="_blank" rel="noopener noreferrer">
                   <Linkedin className="w-5 h-5 mr-2" />
                   Connect on LinkedIn
                 </a>
