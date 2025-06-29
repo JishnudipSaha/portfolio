@@ -91,22 +91,17 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-6 text-gray-300 leading-relaxed">
               <p>
-                Hello! I'm Jishnudip Saha, an enthusiastic undergraduate student at Narula Institute of Technology, currently pursuing a degree in Data Science. 
-                From a young age, I’ve been fascinated by how technology can solve real-world problems and enhance lives. 
-                This passion drove me to explore a variety of domains—ranging from AI-driven applications to sensor-based hardware projects. 
-                My journey began with simple curiosity but quickly evolved into a deep commitment to learning and creating solutions that blend innovation, utility, and social impact.
+                I'm Jishnudip Saha, an undergraduate student at Narula Institute of Technology, currently pursuing a degree in Data Science. 
+                From an early age, I’ve been passionate about using technology to solve real-world problems and improve lives. 
+                This curiosity led me to explore diverse domains, including AI, embedded systems, and full-stack development.
               </p>
               <p>
-                I specialize in building intelligent systems that bridge the gap between hardware and software. 
-                Some of my most meaningful projects include a robotic shoe polisher that automatically detects and cleans footwear, 
-                a smart EEG-based headband to help individuals with speech impairments communicate, and a mosquito repellent device using automated spraying and UV attraction. 
-                I love experimenting with microcontrollers like ESP32, using machine learning, and deploying full-stack applications. 
-                I’ve also developed skills in Python, Next.js, embedded systems, and cloud-based platforms—constantly refining my technical toolkit.
+                My work focuses on building intelligent systems that bridge hardware and software. Notable projects include a robotic shoe polisher, a smart EEG-based headband for speech-impaired individuals, and an automated mosquito repellent device. 
+                I enjoy working with microcontrollers like the ESP32, developing machine learning models, and deploying applications using tools like Python, Next.js, and cloud services.
               </p>
               <p>
-                Beyond coding, I am a collaborative learner and an active participant in tech events, hackathons, and research initiatives. I enjoy contributing to open-source projects, mentoring peers, and pushing boundaries through experimentation. 
-                Whether it's working on AI-powered navigation for the visually impaired or exploring the future of health-monitoring wearables, I’m driven by the desire to create meaningful change. 
-                My mission is simple: to use technology not just to innovate, but to impact lives—ethically, inclusively, and intelligently.
+                Beyond technical skills, I’m a collaborative learner who thrives in team settings—whether it’s through hackathons, research, or open-source contributions. 
+                My mission is to create impactful technology that is ethical, inclusive, and aimed at solving meaningful challenges.
               </p>
             </div>
           </div>
