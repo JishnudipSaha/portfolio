@@ -87,6 +87,12 @@ export default function AchievementsPage() {
       date: "2025",
       credentialId: "14831174",
     },
+    {
+      title: "Deloitte Australia - Data Analytics Job Simulation",
+      issuer: "Forage",
+      date: "2025",
+      credentialId: "tSnoZBedSrx5NHkLz",
+    },
   ]
 
   const stats = [

@@ -45,7 +45,7 @@ export default function ProjectsPage() {
       category: "java",
       github: "https://github.com/JishnudipSaha/Library.Managements-007",
       //live: "https://example.com",
-      featured: true,
+      featured: false,
     },
     {
       id: 2,
@@ -60,14 +60,14 @@ export default function ProjectsPage() {
     },
     {
       id: 3,
-      title: "Data Visualization Dashboard",
-      description: "Interactive dashboard for data analysis with charts, graphs, and real-time updates.",
-      image: "./under_construction_pic.jpg?height=300&width=500",
-      technologies: ["React", "D3.js", "Python", "FastAPI"],
+      title: "Movie Recommendation System",
+      description: "A ML based system that recommends movies by analyzing it and suggesting similar or popular titles.",
+      image: "./movie-recomendation-system.jpg?height=300&width=500",
+      technologies: ["Python", "scikit-learn", "NLTK"],
       category: "data",
-      github: "https://github.com",
-      //live: "https://example.com",
-      featured: false,
+      github: "https://github.com/JishnudipSaha/mrs-project-tmdb",
+      live: "https://jishnudip-mrs-project-tmdb.streamlit.app/",
+      featured: true,
     },
   ]
 
