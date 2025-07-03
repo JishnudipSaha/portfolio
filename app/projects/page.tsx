@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Navigation from "@/components/navigation"
 import CustomCursor from "@/components/custom-cursor"
 import AnimatedSection from "@/components/animated-section"
-import { ExternalLink, Github, Code, Smartphone, Globe, Database, Coffee } from "lucide-react"
+import { ExternalLink, Github, Code, Smartphone, Globe, Database, Coffee, ArrowDownToLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
@@ -40,11 +40,9 @@ export default function ProjectsPage() {
       title: "Library Management System",
       description: "A collaborative library management system with real-time updates and team features.",
       image: "./library_management_image.jpg?height=300&width=500",
-      //technologies: ["Next.js", "TypeScript", "PostgreSQL", "Socket.io"],
       technologies: ["Java"],
-      category: "java",
+      categories: ["java"],
       github: "https://github.com/JishnudipSaha/Library.Managements-007",
-      //live: "https://example.com",
       featured: false,
     },
     {
@@ -53,7 +51,7 @@ export default function ProjectsPage() {
       description: "A responsive portfolio website with smooth animations and modern design.",
       image: "./placeholder-user.jpg?height=300&width=500",
       technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"],
-      category: "web",
+      categories: ["web"],
       github: "https://github.com/JishnudipSaha/portfolio",
       live: "https://jishnudip-saha-portfolio-website.vercel.app/",
       featured: true,
@@ -64,9 +62,20 @@ export default function ProjectsPage() {
       description: "A ML based system that recommends movies by analyzing it and suggesting similar or popular titles.",
       image: "./movie-recomendation-system.jpg?height=300&width=500",
       technologies: ["Python", "scikit-learn", "NLTK"],
-      category: "data",
+      categories: ["data"],
       github: "https://github.com/JishnudipSaha/mrs-project-tmdb",
       live: "https://jishnudip-mrs-project-tmdb.streamlit.app/",
+      featured: true,
+    },
+    {
+      id: 4,
+      title: "Email/SMS spam prediction",
+      description: "A ML based system that classifies weather the email/sms is spam or not.",
+      image: "./under_construction_pic.jpg?height=300&width=500",
+      technologies: [""],
+      categories: ["upcoming", "data"],
+      github: "https://github.com",
+      live: "",
       featured: true,
     },
   ]
@@ -74,12 +83,14 @@ export default function ProjectsPage() {
   const categories = [
     { id: "all", label: "All Projects", icon: Code },
     { id: "web", label: "Web Apps", icon: Globe },
-    //{ id: "mobile", label: "Mobile Apps", icon: Smartphone },
     { id: "data", label: "Data Science", icon: Database },
     { id: "java", label: "Java", icon: Coffee },
+    { id: "upcoming", label: "Upcoming Projects", icon: ArrowDownToLine },
   ]
 
-  const filteredProjects = filter === "all" ? projects : projects.filter((project) => project.category === filter)
+  const filteredProjects = filter === "all"
+    ? projects
+    : projects.filter((project) => project.categories && project.categories.includes(filter))
 
   const featuredProjects = projects.filter((project) => project.featured)
 
