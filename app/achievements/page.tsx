@@ -31,7 +31,7 @@ export default function AchievementsPage() {
     */
     {
       id: 1,
-      title: "Gold medal in java from hackerrank",
+      title: "Gold medal in Java from Hackerrank",
       description: "Completed complex java problems in java with in given amount of time.",
       date: "2023",
       location: "Kolkata, India",
@@ -41,13 +41,23 @@ export default function AchievementsPage() {
     },
     {
       id: 2,
-      title: "AEC hardware competition Participant",
+      title: "AEC hardware competition participant",
       description: "Selected as a participant in Google Summer of Code, contributing to open-source projects.",
       date: "2025",
       location: "Asansole, West Bengal, India",
       icon: Star,
       color: "from-blue-500 to-cyan-500",
       category: "Competition",
+    },
+    {
+      id: 3,
+      title: "Data Science Intern at CodSoft",
+      description: "Selected as a data science intern in CodSoft, contributing to open-source projects.",
+      date: "2025",
+      location: "Remote, Kolkata, West Bengal, India",
+      icon: Calendar,
+      color: "from-green-500 to-cyan-500",
+      category: "Internship",
     },
   ]
 
@@ -88,10 +98,16 @@ export default function AchievementsPage() {
       credentialId: "14831174",
     },
     {
-      title: "Deloitte Australia - Data Analytics Job Simulation",
-      issuer: "Forage",
+      title: "Data Analytics Job Simulation",
+      issuer: "Delloit-Australia, Forage",
       date: "2025",
       credentialId: "tSnoZBedSrx5NHkLz",
+    },
+    {
+      title: "Data Science Intern",
+      issuer: "CodSoft",
+      date: "2025",
+      credentialId: "CS25RY84986",
     },
   ]
 
