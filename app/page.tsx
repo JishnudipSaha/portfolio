@@ -16,10 +16,10 @@ export default function HomePage() {
   }, [])
 
   const stats = [
-    { label: "Projects Completed", value: "25+", icon: Code },
+    { label: "Projects Completed", value: "10+", icon: Code },
     { label: "Achievements", value: "12", icon: Award },
     { label: "Years Experience", value: "3", icon: User },
-    { label: "Technologies", value: "15+", icon: Briefcase },
+    { label: "Technologies", value: "6+", icon: Briefcase },
   ]
 
   if (!mounted) return null

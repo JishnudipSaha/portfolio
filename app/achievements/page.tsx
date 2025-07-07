@@ -114,8 +114,8 @@ export default function AchievementsPage() {
   const stats = [
     { label: "Competitions Won", value: "5", icon: Trophy },
     { label: "Certifications", value: "12", icon: Award },
-    { label: "Open Source Contributions", value: "50+", icon: Star },
-    { label: "Projects Completed", value: "15+", icon: Medal },
+    { label: "Open Source Contributions", value: "15+", icon: Star },
+    { label: "Projects Completed", value: "10+", icon: Medal },
   ]
 
   if (!mounted) return null
