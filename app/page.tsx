@@ -66,7 +66,7 @@ export default function HomePage() {
               className="neon-button-outline border-2 border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105"
               asChild
             >
-              <a href="/cv.pdf" download>
+              <a href="/Jishnu_Resume.pdf" download>
                 <Download className="mr-2 w-5 h-5" />
                 Download CV
               </a>
