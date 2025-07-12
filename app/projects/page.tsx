@@ -84,7 +84,7 @@ export default function ProjectsPage() {
       description: "An ML-based system that analyzes messages and accurately classifies them as spam or not spam to enhance communication security.",
       image: "./under_construction_pic.jpg?height=300&width=500",
       technologies: ["Python", "Meachine Learning"],
-      categories: ["upcoming"],
+      categories: ["data","upcoming"],
       github: "https://github.com",
       live: "",
       featured: false,
