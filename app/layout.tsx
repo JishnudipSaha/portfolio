@@ -8,9 +8,9 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Jishnudip Saha - Portfolio",
   description: "Undergraduate Student & Passionate Developer - Portfolio showcasing projects, achievements, and skills",
-  keywords: "Jishnudip Saha, Portfolio, Developer, Student, Web Development, Programming",
+  keywords: "Jishnudip Saha, Portfolio, Developer, Student, Data Science, Programming",
   authors: [{ name: "Jishnudip Saha" }],
-  generator: 'v0.dev'
+  generator: 'Jishnudip Saha'
 }
 
 export const viewport = {
