@@ -67,7 +67,7 @@ export default function HomePage() {
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <a
-                href="/jishnu cv.pdf" download
+                href="/Jishnudip%20Saha%20CV.pdf" download
                 className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-purple-500/30 text-purple-300 font-semibold text-sm transition-all duration-300 hover:bg-purple-500/10 hover:scale-105"
               >
                 <Download className="w-4 h-4" />
