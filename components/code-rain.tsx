@@ -9,7 +9,6 @@ interface Drop {
   y: number
   speed: number
   length: number
-  opacity: number
 }
 
 export default function CodeRain() {
@@ -21,62 +20,65 @@ export default function CodeRain() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
+    let animId: number
+    let dpr = 1
+
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      dpr = window.devicePixelRatio || 1
+      const w = window.innerWidth
+      const h = window.innerHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     resize()
     window.addEventListener("resize", resize)
 
-    const fontSize = 14
-    const cols = Math.floor(canvas.width / fontSize)
+    const fontSize = 15
+    const cols = Math.floor(window.innerWidth / fontSize)
     const drops: Drop[] = []
 
     for (let i = 0; i < cols; i++) {
       drops.push({
         x: i * fontSize,
-        y: Math.random() * canvas.height,
-        speed: 0.3 + Math.random() * 0.7,
-        length: 5 + Math.floor(Math.random() * 15),
-        opacity: 0.05 + Math.random() * 0.12,
+        y: -Math.random() * window.innerHeight,
+        speed: 0.4 + Math.random() * 0.6,
+        length: 8 + Math.floor(Math.random() * 12),
       })
     }
 
-    let animId: number
-
     const draw = () => {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.font = `${fontSize}px "Courier New", monospace`
+      ctx.fillStyle = `rgba(0, 0, 0, 0.06)`
+      ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr)
+      ctx.font = `bold ${fontSize}px "Courier New", "MS Gothic", monospace`
+      ctx.textBaseline = "top"
 
       for (const drop of drops) {
         for (let i = 0; i < drop.length; i++) {
           const char = chars[Math.floor(Math.random() * chars.length)]
           const yPos = drop.y - i * fontSize
-          if (yPos < -fontSize * drop.length || yPos > canvas.height + fontSize) continue
+          if (yPos < -fontSize * 3 || yPos > window.innerHeight + fontSize) continue
 
           const distFromHead = i
-          const alpha = Math.max(0, 1 - distFromHead / drop.length) * drop.opacity
+          const alpha = Math.max(0.15, 1 - distFromHead / drop.length)
 
           if (i === 0) {
-            ctx.fillStyle = `rgba(147, 51, 234, ${alpha * 0.8})`
-            ctx.shadowColor = "rgba(147, 51, 234, 0.3)"
-            ctx.shadowBlur = 8
+            ctx.fillStyle = `rgba(168, 85, 247, ${alpha})`
           } else if (i < 3) {
-            ctx.fillStyle = `rgba(59, 130, 246, ${alpha * 0.5})`
-            ctx.shadowBlur = 0
+            ctx.fillStyle = `rgba(147, 51, 234, ${alpha * 0.7})`
           } else {
-            ctx.fillStyle = `rgba(147, 51, 234, ${alpha * 0.25})`
-            ctx.shadowBlur = 0
+            ctx.fillStyle = `rgba(147, 51, 234, ${alpha * 0.3})`
           }
 
           ctx.fillText(char, drop.x, yPos)
         }
 
         drop.y += drop.speed
-        if (drop.y - drop.length * fontSize > canvas.height) {
+        if (drop.y - drop.length * fontSize > window.innerHeight) {
           drop.y = -drop.length * fontSize
-          drop.speed = 0.3 + Math.random() * 0.7
+          drop.speed = 0.4 + Math.random() * 0.6
         }
       }
 
@@ -95,7 +97,7 @@ export default function CodeRain() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-[1]"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.4 }}
     />
   )
 }
