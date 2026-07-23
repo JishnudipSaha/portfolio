@@ -1,147 +1,141 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowRight, Download, Github, Linkedin, Mail, Code, Award, User, Briefcase } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Navigation from "@/components/navigation"
-import CustomCursor from "@/components/custom-cursor"
-import AnimatedSection from "@/components/animated-section"
+import { ArrowRight, Download, Github, Linkedin, Mail, Code, Award, User, Briefcase, Terminal } from "lucide-react"
+import FloatingElements from "@/components/floating-elements"
+import SectionWrapper from "@/components/section-wrapper"
+import GradientText from "@/components/gradient-text"
+import AnimatedCounter from "@/components/animated-counter"
+
+const stats = [
+  { label: "Projects", value: 10, suffix: "+", icon: Code },
+  { label: "Achievements", value: 12, suffix: "", icon: Award },
+  { label: "Experience", value: 3, suffix: "+ yrs", icon: User },
+  { label: "Technologies", value: 16, suffix: "+", icon: Briefcase },
+]
 
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const stats = [
-    { label: "Projects Completed", value: "10+", icon: Code },
-    { label: "Achievements", value: "12", icon: Award },
-    { label: "Years Experience", value: "3", icon: User },
-    { label: "Technologies", value: "6+", icon: Briefcase },
-  ]
-
-  if (!mounted) return null
-
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      <CustomCursor />
-      <Navigation />
+    <main className="min-h-screen bg-black">
+      <FloatingElements />
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20" />
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        </div>
+      <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-950/20 via-black to-blue-950/20" />
+        <div className="absolute inset-0 opacity-[0.015]" style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "40px 40px",
+        }} />
 
-        <AnimatedSection className="relative z-10 text-center max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
+        <div className="relative z-10 text-center max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-purple-500/20 bg-purple-500/5">
+            <Terminal className="w-4 h-4 text-purple-400" />
+            <span className="text-purple-400 text-xs font-mono tracking-wide">$ ./greet --world</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
               Jishnudip Saha
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
-              Data Science Student & Passionate Developer
-            </p>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-12">
-              Crafting digital experiences with modern technologies. Turning ideas into reality through code and
-              creativity.
-            </p>
-          </div>
+            </span>
+          </h1>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-            <Button
-              asChild
-              className="neon-button bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105"
-            >
-              <Link href="/projects">
-                View My Work <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
+          <p className="text-lg sm:text-xl text-gray-300 mb-4">
+            Data Science Student & Developer
+          </p>
 
-            <Button
-              variant="outline"
-              className="neon-button-outline border-2 border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105"
-              asChild
-            >
-              <a href="/jishnu cv.pdf" download>
-                <Download className="mr-2 w-5 h-5" />
-                Download CV
-              </a>
-            </Button>
-          </div>
+          <p className="text-sm sm:text-base text-gray-500 max-w-xl mx-auto mb-12 leading-relaxed">
+            Building intelligent systems that bridge hardware and software — from ML models to full-stack applications.
+          </p>
 
-          <div className="flex justify-center space-x-8">
-            <a
-              href="https://github.com/JishnudipSaha"
-              className="social-link text-gray-400 hover:text-purple-400 transition-colors duration-300"
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <Link
+              href="/projects"
+              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105"
             >
-              <Github className="w-8 h-8" />
-            </a>
+              View My Work
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
             <a
-              href="https://www.linkedin.com/in/jishnudipsaha/"
-              className="social-link text-gray-400 hover:text-blue-400 transition-colors duration-300"
+              href="/jishnu cv.pdf" download
+              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-purple-500/30 text-purple-300 font-semibold text-sm transition-all duration-300 hover:bg-purple-500/10 hover:scale-105"
             >
-              <Linkedin className="w-8 h-8" />
-            </a>
-            <a
-              href="mailto:jishnudip.saha.2004@gmail.com"
-              className="social-link text-gray-400 hover:text-pink-400 transition-colors duration-300"
-            >
-              <Mail className="w-8 h-8" />
+              <Download className="w-4 h-4" />
+              Download CV
             </a>
           </div>
-        </AnimatedSection>
-      </section>
 
-      {/* Stats Section */}
-      <AnimatedSection className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            My Journey in Numbers
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="stat-card bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 text-center hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+          <div className="flex justify-center gap-6">
+            {[
+              { icon: Github, href: "https://github.com/JishnudipSaha", color: "hover:text-purple-400" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/jishnudipsaha/", color: "hover:text-blue-400" },
+              { icon: Mail, href: "mailto:jishnudip.saha.2004@gmail.com", color: "hover:text-pink-400" },
+            ].map((s, i) => (
+              <a
+                key={i}
+                href={s.href}
+                target="_blank" rel="noopener noreferrer"
+                className={`text-gray-500 ${s.color} transition-all duration-300 hover:-translate-y-1 hover:scale-110 inline-block`}
               >
-                <stat.icon className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-gray-400 text-sm">{stat.label}</div>
-              </div>
+                <s.icon className="w-6 h-6" />
+              </a>
             ))}
           </div>
         </div>
-      </AnimatedSection>
 
-      {/* Quick Navigation */}
-      <AnimatedSection className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Explore My Portfolio
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <Link href="/about" className="nav-card group">
-              <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-                <User className="w-12 h-12 text-purple-400 mb-4" />
-                <h3 className="text-2xl font-bold mb-4">About Me</h3>
-                <p className="text-gray-400">Learn about my background, skills, and passion for technology.</p>
-              </div>
-            </Link>
-
-            <Link href="/achievements" className="nav-card group">
-              <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-blue-500/50 transition-all duration-300 hover:scale-105">
-                <Award className="w-12 h-12 text-blue-400 mb-4" />
-                <h3 className="text-2xl font-bold mb-4">Achievements</h3>
-                <p className="text-gray-400">Discover my accomplishments and recognition in the field.</p>
-              </div>
-            </Link>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="w-5 h-8 rounded-full border border-purple-500/30 flex justify-center">
+            <div className="w-1 h-2.5 rounded-full bg-purple-500/50 mt-2 animate-float" />
           </div>
         </div>
-      </AnimatedSection>
-    </div>
+      </section>
+
+      <section className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <SectionWrapper>
+            <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
+              My Journey in Numbers
+            </GradientText>
+          </SectionWrapper>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {stats.map((stat, i) => (
+              <SectionWrapper key={stat.label} delay={i * 0.1}>
+                <div className="glass rounded-2xl p-6 sm:p-8 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06] hover:border-purple-500/30">
+                  <stat.icon className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-4 text-purple-400" />
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                    <AnimatedCounter end={stat.value} suffix={stat.suffix} duration={2 + i * 0.2} />
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-500">{stat.label}</div>
+                </div>
+              </SectionWrapper>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 px-6 pb-32">
+        <div className="max-w-4xl mx-auto">
+          <SectionWrapper>
+            <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
+              Explore My Portfolio
+            </GradientText>
+          </SectionWrapper>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[
+              { href: "/about", icon: User, title: "About Me", desc: "Background, skills, and passion for technology", from: "from-purple-600/20" },
+              { href: "/achievements", icon: Award, title: "Achievements", desc: "Accomplishments and recognition", from: "from-blue-600/20" },
+            ].map((item, i) => (
+              <SectionWrapper key={item.href} delay={i * 0.15}>
+                <Link href={item.href}>
+                  <div className={`glass rounded-2xl p-8 bg-gradient-to-br ${item.from} to-transparent transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06]`}>
+                    <item.icon className="w-10 h-10 text-purple-400 mb-4" />
+                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </div>
+                </Link>
+              </SectionWrapper>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }

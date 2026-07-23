@@ -1,177 +1,138 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Navigation from "@/components/navigation"
-import CustomCursor from "@/components/custom-cursor"
-import AnimatedSection from "@/components/animated-section"
-import { Code, Database, Palette, Server, Smartphone, Globe, BarChart } from "lucide-react"
-import Image from "next/image"
+import { useRef, useEffect, useState } from "react"
+import { Code, Server, Database, BarChart, Smartphone, Globe, GraduationCap } from "lucide-react"
+import SectionWrapper from "@/components/section-wrapper"
+import GradientText from "@/components/gradient-text"
 
-export default function AboutPage() {
-  const [mounted, setMounted] = useState(false)
+const skills = [
+  { name: "Frontend", icon: Code, level: 90, color: "from-purple-500 to-pink-500" },
+  { name: "Backend", icon: Server, level: 70, color: "from-blue-500 to-cyan-500" },
+  { name: "Databases", icon: Database, level: 80, color: "from-green-500 to-emerald-500" },
+  { name: "Data Analysis", icon: BarChart, level: 75, color: "from-orange-500 to-red-500" },
+  { name: "Mobile", icon: Smartphone, level: 60, color: "from-indigo-500 to-purple-500" },
+  { name: "Web Tech", icon: Globe, level: 80, color: "from-teal-500 to-blue-500" },
+]
+
+const techStack = [
+  "JavaScript", "TypeScript", "React", "Next.js", "Node.js", "Python",
+  "Pandas", "NumPy", "Matplotlib", "Seaborn", "Java", "C++",
+  "MongoDB", "Git", "Figma", "Tailwind CSS", "LangChain", "TensorFlow",
+]
+
+function SkillBar({ name, icon: Icon, level, color, delay }: typeof skills[0] & { delay: number }) {
+  const [visible, setVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const skills = [
-    { name: "Frontend Development", icon: Code, level: 90, color: "from-purple-500 to-pink-500" },
-    { name: "Backend Development", icon: Server, level: 70, color: "from-blue-500 to-cyan-500" },
-    { name: "Database Management", icon: Database, level: 80, color: "from-green-500 to-emerald-500" },
-    { name: "Data Analysis", icon: BarChart, level: 75, color: "from-orange-500 to-red-500" },
-    { name: "Mobile Development", icon: Smartphone, level: 60, color: "from-indigo-500 to-purple-500" },
-    { name: "Web Technologies", icon: Globe, level: 80, color: "from-teal-500 to-blue-500" },
-  ]
-
-  const technologies = [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Next.js",
-    "Node.js",
-    "Python",
-    "Pnandas",
-    "Matplotlib",
-    "Seaborn",
-    "Numpy",
-    "Java",
-    "C++",
-    "MongoDB",
-    "Git",
-    "Figma",
-    "Tailwind CSS",
-  ]
-
-  if (!mounted) return null
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setVisible(true), delay * 1000)
+          observer.unobserve(el)
+        }
+      },
+      { threshold: 0.3 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [delay])
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <CustomCursor />
-      <Navigation />
+    <div ref={ref} className="glass rounded-xl p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.06]">
+      <div className="flex items-center gap-3 mb-4">
+        <Icon className="w-5 h-5 text-purple-400" />
+        <span className="font-medium text-sm">{name}</span>
+      </div>
+      <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${color} transition-all duration-1000 ease-out`}
+          style={{ width: visible ? `${level}%` : "0%" }}
+        />
+      </div>
+      <span className="text-xs text-gray-500 mt-1.5 block">{level}%</span>
+    </div>
+  )
+}
 
-      <div className="pt-20 px-4">
-        {/* Hero Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-20">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen bg-black pt-24">
+      <div className="px-6 pb-24">
+        <SectionWrapper>
+          <div className="max-w-6xl mx-auto text-center py-16">
+            <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               About Me
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            </GradientText>
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Passionate about creating innovative solutions and pushing the boundaries of technology
             </p>
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Story Section */}
-        <AnimatedSection className="max-w-4xl mx-auto py-16">
-          <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-3xl p-8 md:p-12">
-            {/* Profile Picture */}
-            <div className="flex justify-center mb-12">
-              <div className="relative">
-                <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl">
-                  <Image
-                    src="./placeholder-user.jpg?height=300&width=300" // place for profile pic upload
-                    alt="Jishnudip Saha"
-                    width={300}
-                    height={300}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                    priority
-                  />
+        <SectionWrapper delay={0.15}>
+          <div className="max-w-4xl mx-auto mb-24">
+            <div className="glass rounded-3xl p-8 md:p-12 gradient-border">
+              <div className="flex flex-col md:flex-row gap-10 items-start">
+                <div className="flex-shrink-0 mx-auto md:mx-0">
+                  <div className="relative w-40 h-40 rounded-2xl overflow-hidden border border-purple-500/30 transition-transform duration-300 hover:scale-105">
+                    <img src="./placeholder-user.jpg" alt="Jishnudip Saha" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 to-transparent" />
+                  </div>
                 </div>
-                {/* Decorative rings */}
-                <div className="absolute inset-0 rounded-full border-2 border-purple-400/30 animate-pulse"></div>
-                <div className="absolute -inset-4 rounded-full border border-blue-400/20 animate-pulse delay-1000"></div>
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 blur-xl -z-10"></div>
+                <div className="space-y-4 text-gray-300 text-sm leading-relaxed">
+                  <p>I&apos;m Jishnudip Saha, an undergraduate student at Narula Institute of Technology, pursuing a degree in Data Science. I&apos;ve been passionate about using technology to solve real-world problems — from AI and embedded systems to full-stack development.</p>
+                  <p>My work focuses on building intelligent systems that bridge hardware and software. Notable projects include a robotic shoe polisher, a smart EEG-based headband, and ML models for eye disease prediction.</p>
+                  <p>I thrive in team settings — hackathons, research, and open-source. My mission is to create ethical, inclusive technology that solves meaningful challenges.</p>
+                </div>
               </div>
-            </div>
-
-            <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              My Story
-            </h2>
-            <div className="space-y-6 text-gray-300 leading-relaxed">
-              <p>
-                I'm Jishnudip Saha, an undergraduate student at Narula Institute of Technology, currently pursuing a degree in Data Science. 
-                From an early age, I’ve been passionate about using technology to solve real-world problems and improve lives. 
-                This curiosity led me to explore diverse domains, including AI, embedded systems, and full-stack development.
-              </p>
-              <p>
-                My work focuses on building intelligent systems that bridge hardware and software. Notable projects include a robotic shoe polisher, a smart EEG-based headband for speech-impaired individuals, and an automated mosquito repellent device. 
-                I enjoy working with microcontrollers like the ESP32, developing machine learning models, and deploying applications using tools like Python, Next.js, and cloud services.
-              </p>
-              <p>
-                Beyond technical skills, I’m a collaborative learner who thrives in team settings—whether it’s through hackathons, research, or open-source contributions. 
-                My mission is to create impactful technology that is ethical, inclusive, and aimed at solving meaningful challenges.
-              </p>
             </div>
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Skills Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-16">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <SectionWrapper delay={0.2}>
+          <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Skills & Expertise
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {skills.map((skill, index) => (
-              <div
-                key={index}
-                className="skill-card bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-purple-500/50 transition-all duration-300"
-              >
-                <div className="flex items-center mb-4">
-                  <skill.icon className="w-8 h-8 text-purple-400 mr-4" />
-                  <h3 className="text-xl font-semibold">{skill.name}</h3>
-                </div>
-                <div className="relative">
-                  <div className="w-full bg-gray-700 rounded-full h-3">
-                    <div
-                      className={`h-3 rounded-full bg-gradient-to-r ${skill.color} transition-all duration-1000 ease-out`}
-                      style={{ width: `${skill.level}%` }}
-                    />
-                  </div>
-                  <span className="text-sm text-gray-400 mt-2 block">{skill.level}%</span>
-                </div>
-              </div>
+          </GradientText>
+          <div className="max-w-4xl mx-auto grid sm:grid-cols-2 gap-4 mb-24">
+            {skills.map((skill, i) => (
+              <SkillBar key={skill.name} {...skill} delay={i * 0.1} />
             ))}
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Technologies Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-16">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Technologies I Work With
-          </h2>
-          <div className="flex flex-wrap justify-center gap-4">
-            {technologies.map((tech, index) => (
+        <SectionWrapper delay={0.2}>
+          <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
+            Technologies I Use
+          </GradientText>
+          <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3 mb-24">
+            {techStack.map((tech) => (
               <span
-                key={index}
-                className="tech-tag bg-gradient-to-r from-purple-900/30 to-blue-900/30 backdrop-blur-sm border border-gray-700 px-6 py-3 rounded-full text-sm font-medium hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+                key={tech}
+                className="px-4 py-2 text-sm rounded-full glass text-gray-300 border border-white/5 transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:bg-white/[0.06]"
               >
                 {tech}
               </span>
             ))}
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Education Section */}
-        <AnimatedSection className="max-w-4xl mx-auto py-16 pb-32">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <SectionWrapper delay={0.2}>
+          <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Education
-          </h2>
-          <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-3xl p-8 md:p-12">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4">Bachelor's Degree in Computer Science</h3>
-              <p className="text-purple-400 text-lg mb-4">Narula Institute of Technology</p>
-              <p className="text-gray-400 mb-6">Expected Graduation: 2027</p>
-              <p className="text-gray-300 leading-relaxed">
-                Currently pursuing my undergraduate degree with a focus on software development, algorithms, and modern
-                web technologies. Maintaining excellent academic performance while actively participating in coding
-                competitions and tech communities.
-              </p>
+          </GradientText>
+          <div className="max-w-2xl mx-auto">
+            <div className="glass rounded-2xl p-8 gradient-border text-center transition-all duration-300 hover:-translate-y-1">
+              <GraduationCap className="w-10 h-10 text-purple-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold mb-2">B.Tech in Computer Science (Data Science)</h3>
+              <p className="text-purple-400 mb-1">Narula Institute of Technology</p>
+              <p className="text-gray-500 text-sm">Expected 2027</p>
             </div>
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
       </div>
-    </div>
+    </main>
   )
 }

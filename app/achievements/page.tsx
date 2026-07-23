@@ -1,226 +1,123 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Navigation from "@/components/navigation"
-import CustomCursor from "@/components/custom-cursor"
-import AnimatedSection from "@/components/animated-section"
 import { Award, Trophy, Medal, Star, Calendar, MapPin } from "lucide-react"
+import SectionWrapper from "@/components/section-wrapper"
+import GradientText from "@/components/gradient-text"
+import AnimatedCounter from "@/components/animated-counter"
+
+const achievements = [
+  {
+    title: "Gold Medal in Java",
+    description: "Earned gold medal on Hackerrank for solving complex Java problems within time constraints.",
+    date: "2023", location: "Kolkata, India",
+    icon: Trophy, color: "from-yellow-500 to-orange-500", category: "Problem Solving",
+  },
+  {
+    title: "AEC Hardware Competition",
+    description: "Selected participant in hardware competition showcasing embedded systems and IoT skills.",
+    date: "2025", location: "Asansol, West Bengal",
+    icon: Star, color: "from-blue-500 to-cyan-500", category: "Competition",
+  },
+  {
+    title: "Data Science Intern — CodSoft",
+    description: "Selected as a data science intern, contributing to ML projects and data analysis pipelines.",
+    date: "2025", location: "Remote",
+    icon: Calendar, color: "from-green-500 to-emerald-500", category: "Internship",
+  },
+]
+
+const certifications = [
+  { title: "Ask Questions to Make Data-Driven Decisions", issuer: "Google", date: "2025", id: "DXSOTTIOFTLS" },
+  { title: "Prompt Design in Vertex AI", issuer: "Google Cloud", date: "2023", id: "14806704" },
+  { title: "Foundations: Data, Data, Everywhere", issuer: "Google", date: "2023", id: "KKULYPOUAE17" },
+  { title: "Build Real World AI with Gemini", issuer: "Google Cloud", date: "2025", id: "14831174" },
+  { title: "Data Analytics Job Simulation", issuer: "Deloitte Australia — Forage", date: "2025", id: "tSnoZBedSrx5NHkLz" },
+  { title: "Data Science Intern", issuer: "CodSoft", date: "2025", id: "CS25RY84986" },
+]
+
+const stats = [
+  { label: "Competitions", value: 5, icon: Trophy },
+  { label: "Certifications", value: 12, icon: Award },
+  { label: "Open Source", value: 15, suffix: "+", icon: Star },
+  { label: "Projects", value: 10, suffix: "+", icon: Medal },
+]
 
 export default function AchievementsPage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const achievements = [
-    /*
-    Format: 
-
-    {
-      id: 1,
-      title: "First Place - National Coding Championship",
-      description: "Won first place in the national level coding competition with over 5000 participants.",
-      date: "2024",
-      location: "New Delhi, India",
-      icon: Trophy,
-      color: "from-yellow-500 to-orange-500",
-      category: "Competition",
-    },
-
-    */
-    {
-      id: 1,
-      title: "Gold medal in Java from Hackerrank",
-      description: "Completed complex java problems in java with in given amount of time.",
-      date: "2023",
-      location: "Kolkata, India",
-      icon: Trophy,
-      color: "from-yellow-500 to-orange-500",
-      category: "Problem Solving",
-    },
-    {
-      id: 2,
-      title: "AEC hardware competition participant",
-      description: "Selected as a participant in Google Summer of Code, contributing to open-source projects.",
-      date: "2025",
-      location: "Asansole, West Bengal, India",
-      icon: Star,
-      color: "from-blue-500 to-cyan-500",
-      category: "Competition",
-    },
-    {
-      id: 3,
-      title: "Data Science Intern at CodSoft",
-      description: "Selected as a data science intern in CodSoft, contributing to open-source projects.",
-      date: "2025",
-      location: "Remote, Kolkata, West Bengal, India",
-      icon: Calendar,
-      color: "from-green-500 to-cyan-500",
-      category: "Internship",
-    },
-  ]
-
-  const certifications = [
-    /*
-    Format: 
-
-    {
-      title: "AWS Certified Developer",
-      issuer: "Amazon Web Services",
-      date: "2024",
-      credentialId: "AWS-DEV-2024-001",
-    },
-
-    */
-    {
-      title: "Ask Questions to Make Data-Driven Decisions",
-      issuer: "Google",
-      date: "2025",
-      credentialId: "DXSOTTIOFTLS",
-    },
-    {
-      title: "Prompt Design in Vertex Ai",
-      issuer: "Google Cloud",
-      date: "2023",
-      credentialId: "14806704",
-    },
-    {
-      title: "Foundations: Data, Data, Everywhere",
-      issuer: "Google",
-      date: "2023",
-      credentialId: "KKULYPOUAE17",
-    },
-    {
-      title: "Build Real World AI Applications with Gemini",
-      issuer: "Google Cloud",
-      date: "2025",
-      credentialId: "14831174",
-    },
-    {
-      title: "Data Analytics Job Simulation",
-      issuer: "Delloit-Australia, Forage",
-      date: "2025",
-      credentialId: "tSnoZBedSrx5NHkLz",
-    },
-    {
-      title: "Data Science Intern",
-      issuer: "CodSoft",
-      date: "2025",
-      credentialId: "CS25RY84986",
-    },
-  ]
-
-  const stats = [
-    { label: "Competitions Won", value: "5", icon: Trophy },
-    { label: "Certifications", value: "12", icon: Award },
-    { label: "Open Source Contributions", value: "15+", icon: Star },
-    { label: "Projects Completed", value: "10+", icon: Medal },
-  ]
-
-  if (!mounted) return null
-
   return (
-    <div className="min-h-screen bg-black text-white">
-      <CustomCursor />
-      <Navigation />
-
-      <div className="pt-20 px-4">
-        {/* Hero Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-20">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+    <main className="min-h-screen bg-black pt-24">
+      <div className="px-6 pb-24">
+        <SectionWrapper>
+          <div className="max-w-6xl mx-auto text-center py-16">
+            <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               Achievements
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            </GradientText>
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Milestones and recognition earned through dedication and hard work
             </p>
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Stats Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="stat-card bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
-              >
-                <stat.icon className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-gray-400 text-sm">{stat.label}</div>
+        <SectionWrapper delay={0.15}>
+          <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-24">
+            {stats.map((s, i) => (
+              <div key={s.label} className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06]">
+                <s.icon className="w-8 h-8 mx-auto mb-3 text-purple-400" />
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                  <AnimatedCounter end={s.value} suffix={s.suffix || ""} duration={2 + i * 0.15} />
+                </div>
+                <div className="text-xs sm:text-sm text-gray-500">{s.label}</div>
               </div>
             ))}
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Achievements Timeline */}
-        <AnimatedSection className="max-w-4xl mx-auto py-16">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <SectionWrapper delay={0.2}>
+          <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Major Achievements
-          </h2>
-          <div className="space-y-8">
-            {achievements.map((achievement, index) => (
-              <div key={achievement.id} className="achievement-card group">
-                <div className="flex flex-col md:flex-row gap-6 bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-                  <div className="flex-shrink-0">
-                    <div
-                      className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${achievement.color} flex items-center justify-center`}
-                    >
-                      <achievement.icon className="w-8 h-8 text-white" />
+          </GradientText>
+          <div className="max-w-4xl mx-auto space-y-6 relative mb-24">
+            <div className="hidden md:block absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/30 via-blue-500/20 to-transparent" />
+            {achievements.map((a) => (
+              <div key={a.title} className="glass rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-5 transition-all duration-300 hover:-translate-x-1 hover:bg-white/[0.06]">
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${a.color} flex items-center justify-center flex-shrink-0`}>
+                  <a.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                    <h3 className="text-lg font-bold">{a.title}</h3>
+                    <div className="flex gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{a.date}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.location}</span>
                     </div>
                   </div>
-                  <div className="flex-grow">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                      <h3 className="text-2xl font-bold mb-2 md:mb-0">{achievement.title}</h3>
-                      <div className="flex flex-col md:items-end text-sm text-gray-400">
-                        <div className="flex items-center mb-1">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          {achievement.date}
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          {achievement.location}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-gray-300 leading-relaxed mb-4">{achievement.description}</p>
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${achievement.color} text-white`}
-                    >
-                      {achievement.category}
-                    </span>
-                  </div>
+                  <p className="text-sm text-gray-400 mb-3">{a.description}</p>
+                  <span className={`inline-block px-3 py-1 text-xs rounded-full bg-gradient-to-r ${a.color} text-white`}>{a.category}</span>
                 </div>
               </div>
             ))}
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
 
-        {/* Certifications Section */}
-        <AnimatedSection className="max-w-6xl mx-auto py-16 pb-32">
-          <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <SectionWrapper delay={0.2}>
+          <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Certifications
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {certifications.map((cert, index) => (
-              <div key={index} className="certification-card">
-                <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-purple-500/50 transition-all duration-300 hover:scale-105">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-grow">
-                      <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
-                      <p className="text-purple-400 font-medium mb-2">{cert.issuer}</p>
-                      <p className="text-gray-400 text-sm mb-2">Issued: {cert.date}</p>
-                      <p className="text-gray-500 text-xs">ID: {cert.credentialId}</p>
-                    </div>
-                    <Award className="w-8 h-8 text-purple-400 flex-shrink-0" />
+          </GradientText>
+          <div className="max-w-5xl mx-auto grid sm:grid-cols-2 gap-4 sm:gap-6">
+            {certifications.map((cert) => (
+              <div key={cert.id} className="glass rounded-xl p-6 gradient-border transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.06]">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="font-semibold text-sm mb-1">{cert.title}</h3>
+                    <p className="text-purple-400 text-xs mb-1">{cert.issuer}</p>
+                    <p className="text-gray-500 text-xs">Issued {cert.date}</p>
                   </div>
+                  <Award className="w-6 h-6 text-purple-400 flex-shrink-0" />
                 </div>
               </div>
             ))}
           </div>
-        </AnimatedSection>
+        </SectionWrapper>
       </div>
-    </div>
+    </main>
   )
 }
