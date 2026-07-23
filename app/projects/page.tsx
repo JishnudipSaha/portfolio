@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Code, Globe, Database, Coffee, ArrowDownToLine } from "lucide-react"
+import { Code, Globe, Database, Coffee, ArrowDownToLine, Terminal } from "lucide-react"
+import CodeRain from "@/components/code-rain"
 import SectionWrapper from "@/components/section-wrapper"
 import GradientText from "@/components/gradient-text"
 import ProjectCard from "@/components/project-card"
@@ -101,6 +102,14 @@ const categories = [
   { id: "upcoming", label: "Upcoming", icon: ArrowDownToLine },
 ]
 
+const cmdMap: Record<string, string> = {
+  all: "ls --all",
+  web: "ls --filter=web",
+  data: "ls --filter=data-science",
+  java: "ls --filter=java",
+  upcoming: "ls --filter=upcoming",
+}
+
 export default function ProjectsPage() {
   const [filter, setFilter] = useState("all")
 
@@ -109,14 +118,21 @@ export default function ProjectsPage() {
     : projects.filter((p) => p.categories.includes(filter))
 
   return (
-    <main className="min-h-screen bg-black pt-24">
-      <div className="px-6 pb-24">
+    <main className="min-h-screen bg-black pt-24 relative">
+      <CodeRain />
+
+      <div className="relative z-10 px-6 pb-24">
         <SectionWrapper direction="scale">
           <div className="max-w-6xl mx-auto text-center py-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full border border-purple-500/20 bg-purple-500/5">
+              <Terminal className="w-3 h-3 text-purple-400" />
+              <span className="font-mono text-[10px] text-purple-400/60">$ ./projects --list</span>
+            </div>
             <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               My Projects
             </GradientText>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto font-mono text-sm">
+              <span className="text-purple-400/50">// </span>
               A showcase of my technical skills and creative solutions
             </p>
           </div>
@@ -124,6 +140,9 @@ export default function ProjectsPage() {
 
         <SectionWrapper delay={0.2} direction="up">
           <div className="max-w-6xl mx-auto mb-16">
+            <div className="text-center mb-8">
+              <code className="text-[10px] text-purple-400/40 font-mono">// projects.featured()</code>
+            </div>
             <GradientText className="text-2xl sm:text-3xl font-bold text-center mb-12">
               Featured Work
             </GradientText>
@@ -139,22 +158,43 @@ export default function ProjectsPage() {
 
         <SectionWrapper delay={0.2} direction="scale">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {categories.map((cat, i) => (
-                <div key={cat.id} style={{ animationDelay: `${i * 0.07}s` }} className="animate-pop-in opacity-0">
-                  <button
-                    onClick={() => setFilter(cat.id)}
-                    className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 ${
-                      filter === cat.id
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/20"
-                        : "glass text-gray-400 hover:text-white hover:bg-white/5"
-                    }`}
-                  >
-                    <cat.icon className="w-4 h-4" />
-                    {cat.label}
-                  </button>
+            <div className="text-center mb-8">
+              <code className="text-[10px] text-purple-400/40 font-mono">// projects.categories.map()</code>
+            </div>
+
+            <div className="glass rounded-xl mb-8 overflow-hidden">
+              <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5 bg-white/[0.02]">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                <span className="text-gray-600 text-[10px] font-mono ml-2">terminal — filter</span>
+              </div>
+              <div className="p-4 sm:p-5">
+                <p className="font-mono text-xs text-purple-300/90 mb-4">
+                  <span className="text-green-400/60">jishnu@dev:~/projects$</span> {cmdMap[filter]}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat, i) => (
+                    <div key={cat.id} style={{ animationDelay: `${i * 0.07}s` }} className="animate-pop-in opacity-0">
+                      <button
+                        onClick={() => setFilter(cat.id)}
+                        className={`font-mono text-xs px-3.5 py-2 rounded-lg border transition-all duration-300 hover:scale-105 ${
+                          filter === cat.id
+                            ? "bg-purple-600/20 border-purple-500/50 text-purple-300 shadow-lg shadow-purple-500/10"
+                            : "bg-white/[0.03] border-white/5 text-gray-400 hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        <span className="text-purple-400/50">[</span> {cat.label} <span className="text-purple-400/50">]</span>
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+                <div className="mt-4 border-t border-white/5 pt-3">
+                  <p className="font-mono text-[10px] text-gray-600">
+                    <span className="text-purple-400/40">#</span> {filtered.length} result{filtered.length !== 1 ? "s" : ""} returned
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
