@@ -111,7 +111,7 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen bg-black pt-24">
       <div className="px-6 pb-24">
-        <SectionWrapper>
+        <SectionWrapper direction="scale">
           <div className="max-w-6xl mx-auto text-center py-16">
             <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               My Projects
@@ -122,41 +122,46 @@ export default function ProjectsPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="up">
           <div className="max-w-6xl mx-auto mb-16">
             <GradientText className="text-2xl sm:text-3xl font-bold text-center mb-12">
               Featured Work
             </GradientText>
             <div className="grid sm:grid-cols-2 gap-6">
-              {projects.filter(p => p.categories.includes("data") && !p.categories.includes("upcoming")).slice(0, 2).map((project) => (
-                <ProjectCard key={project.id} {...project} />
+              {projects.filter(p => p.categories.includes("data") && !p.categories.includes("upcoming")).slice(0, 2).map((project, i) => (
+                <div key={project.id} style={{ animationDelay: `${i * 0.15}s` }} className="animate-slide-up opacity-0">
+                  <ProjectCard {...project} />
+                </div>
               ))}
             </div>
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="scale">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setFilter(cat.id)}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                    filter === cat.id
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/20"
-                      : "glass text-gray-400 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <cat.icon className="w-4 h-4" />
-                  {cat.label}
-                </button>
+              {categories.map((cat, i) => (
+                <div key={cat.id} style={{ animationDelay: `${i * 0.07}s` }} className="animate-pop-in opacity-0">
+                  <button
+                    onClick={() => setFilter(cat.id)}
+                    className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 ${
+                      filter === cat.id
+                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/20"
+                        : "glass text-gray-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <cat.icon className="w-4 h-4" />
+                    {cat.label}
+                  </button>
+                </div>
               ))}
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((project) => (
-                <ProjectCard key={project.id} {...project} />
+              {filtered.map((project, i) => (
+                <div key={project.id} style={{ animationDelay: `${i * 0.07}s` }} className="animate-slide-up opacity-0">
+                  <ProjectCard {...project} />
+                </div>
               ))}
             </div>
           </div>

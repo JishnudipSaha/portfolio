@@ -8,9 +8,26 @@ interface SectionWrapperProps {
   children: React.ReactNode
   className?: string
   delay?: number
+  direction?: "up" | "left" | "right" | "scale" | "none"
 }
 
-export default function SectionWrapper({ children, className = "", delay = 0 }: SectionWrapperProps) {
+const hiddenStyles = {
+  up: "opacity-0 translate-y-10",
+  left: "opacity-0 translate-x-10",
+  right: "opacity-0 -translate-x-10",
+  scale: "opacity-0 scale-90",
+  none: "",
+}
+
+const visibleStyles = {
+  up: "opacity-100 translate-y-0",
+  left: "opacity-100 translate-x-0",
+  right: "opacity-100 translate-x-0",
+  scale: "opacity-100 scale-100",
+  none: "",
+}
+
+export default function SectionWrapper({ children, className = "", delay = 0, direction = "up" }: SectionWrapperProps) {
   const [visible, setVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -34,7 +51,7 @@ export default function SectionWrapper({ children, className = "", delay = 0 }: 
     <div
       ref={ref}
       className={`${className} transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        visible ? visibleStyles[direction] : hiddenStyles[direction]
       }`}
     >
       {children}

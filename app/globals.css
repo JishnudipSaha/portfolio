@@ -54,15 +54,6 @@ html { scroll-behavior: smooth; }
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.glass-hover {
-  transition: all 0.3s ease;
-}
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(147, 51, 234, 0.3);
-  box-shadow: 0 8px 32px rgba(147, 51, 234, 0.1);
-}
-
 .gradient-border {
   position: relative;
 }
@@ -95,17 +86,48 @@ html { scroll-behavior: smooth; }
 }
 .animate-float { animation: float 3s ease-in-out infinite; }
 
-@keyframes float-delayed {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.animate-float-delayed { animation: float-delayed 3s ease-in-out 1.5s infinite; }
-
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.15); }
   50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.3), 0 0 60px rgba(147, 51, 234, 0.1); }
 }
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+@keyframes float-up {
+  0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+  5% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slide-up 0.7s ease-out forwards; }
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left { animation: slide-left 0.7s ease-out forwards; }
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-right { animation: slide-right 0.7s ease-out forwards; }
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scale-in 0.5s ease-out forwards; }
 
 @keyframes typing {
   from { width: 0; }
@@ -114,30 +136,38 @@ html { scroll-behavior: smooth; }
 @keyframes blink {
   50% { border-color: transparent; }
 }
-.typing-effect {
+.typing-animate {
+  display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  border-right: 2px solid #a855f7;
-  animation: typing 2s steps(30) forwards, blink 0.8s step-end infinite;
+  border-right: 3px solid #a855f7;
+  animation: typing 2s steps(30) 0.5s forwards, blink 0.8s step-end infinite;
+  width: 0;
 }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
 }
-.animate-spin-slow { animation: spin-slow 8s linear infinite; }
 
-@keyframes float-up {
-  0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-  5% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.5); }
+  70% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-pop-in { animation: pop-in 0.4s ease-out forwards; }
+
+@keyframes parallax-bg {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-30px); }
+}
+.parallax-slow {
+  animation: parallax-bg 10s ease-in-out infinite alternate;
 }
 
 .custom-cursor {
@@ -173,6 +203,16 @@ html { scroll-behavior: smooth; }
   width: 4px;
   height: 4px;
 }
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
+.stagger-9 { animation-delay: 0.45s; }
 
 @media (max-width: 768px) {
   .custom-cursor, .custom-cursor-dot { display: none; }

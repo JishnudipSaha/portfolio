@@ -46,7 +46,7 @@ export default function AchievementsPage() {
   return (
     <main className="min-h-screen bg-black pt-24">
       <div className="px-6 pb-24">
-        <SectionWrapper>
+        <SectionWrapper direction="scale">
           <div className="max-w-6xl mx-auto text-center py-16">
             <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               Achievements
@@ -57,10 +57,10 @@ export default function AchievementsPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.15}>
+        <SectionWrapper delay={0.15} direction="up">
           <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-24">
             {stats.map((s, i) => (
-              <div key={s.label} className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06]">
+              <div key={s.label} style={{ animationDelay: `${i * 0.1}s` }} className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06] hover:border-purple-500/30 animate-scale-in opacity-0">
                 <s.icon className="w-8 h-8 mx-auto mb-3 text-purple-400" />
                 <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
                   <AnimatedCounter end={s.value} suffix={s.suffix || ""} duration={2 + i * 0.15} />
@@ -71,15 +71,15 @@ export default function AchievementsPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="scale">
           <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Major Achievements
           </GradientText>
           <div className="max-w-4xl mx-auto space-y-6 relative mb-24">
             <div className="hidden md:block absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/30 via-blue-500/20 to-transparent" />
-            {achievements.map((a) => (
-              <div key={a.title} className="glass rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-5 transition-all duration-300 hover:-translate-x-1 hover:bg-white/[0.06]">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${a.color} flex items-center justify-center flex-shrink-0`}>
+            {achievements.map((a, i) => (
+              <div key={a.title} style={{ animationDelay: `${i * 0.15}s` }} className={`glass rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-5 transition-all duration-500 hover:-translate-y-1 hover:bg-white/[0.06] animate-slide-${i % 2 === 0 ? "right" : "left"} opacity-0`}>
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${a.color} flex items-center justify-center flex-shrink-0 animate-float`}>
                   <a.icon className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
@@ -98,13 +98,13 @@ export default function AchievementsPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="scale">
           <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Certifications
           </GradientText>
           <div className="max-w-5xl mx-auto grid sm:grid-cols-2 gap-4 sm:gap-6">
-            {certifications.map((cert) => (
-              <div key={cert.id} className="glass rounded-xl p-6 gradient-border transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.06]">
+            {certifications.map((cert, i) => (
+              <div key={cert.id} style={{ animationDelay: `${i * 0.07}s` }} className="glass rounded-xl p-6 gradient-border transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06] hover:border-purple-500/30 animate-slide-up opacity-0">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-sm mb-1">{cert.title}</h3>

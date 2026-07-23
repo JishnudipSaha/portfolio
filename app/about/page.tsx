@@ -41,7 +41,7 @@ function SkillBar({ name, icon: Icon, level, color, delay }: typeof skills[0] & 
   }, [delay])
 
   return (
-    <div ref={ref} className="glass rounded-xl p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.06]">
+    <div ref={ref} className={`glass rounded-xl p-5 transition-all duration-500 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
       <div className="flex items-center gap-3 mb-4">
         <Icon className="w-5 h-5 text-purple-400" />
         <span className="font-medium text-sm">{name}</span>
@@ -61,7 +61,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-black pt-24">
       <div className="px-6 pb-24">
-        <SectionWrapper>
+        <SectionWrapper direction="scale">
           <div className="max-w-6xl mx-auto text-center py-16">
             <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
               About Me
@@ -72,27 +72,31 @@ export default function AboutPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.15}>
+        <SectionWrapper delay={0.15} direction="up">
           <div className="max-w-4xl mx-auto mb-24">
             <div className="glass rounded-3xl p-8 md:p-12 gradient-border">
               <div className="flex flex-col md:flex-row gap-10 items-start">
-                <div className="flex-shrink-0 mx-auto md:mx-0">
-                  <div className="relative w-40 h-40 rounded-2xl overflow-hidden border border-purple-500/30 transition-transform duration-300 hover:scale-105">
-                    <img src="./placeholder-user.jpg" alt="Jishnudip Saha" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 to-transparent" />
+                <SectionWrapper direction="left" delay={0.3}>
+                  <div className="flex-shrink-0 mx-auto md:mx-0">
+                    <div className="relative w-40 h-40 rounded-2xl overflow-hidden border border-purple-500/30 transition-transform duration-300 hover:scale-105">
+                      <img src="./placeholder-user.jpg" alt="Jishnudip Saha" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 to-transparent" />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-4 text-gray-300 text-sm leading-relaxed">
-                  <p>I&apos;m Jishnudip Saha, an undergraduate student at Narula Institute of Technology, pursuing a degree in Data Science. I&apos;ve been passionate about using technology to solve real-world problems — from AI and embedded systems to full-stack development.</p>
-                  <p>My work focuses on building intelligent systems that bridge hardware and software. Notable projects include a robotic shoe polisher, a smart EEG-based headband, and ML models for eye disease prediction.</p>
-                  <p>I thrive in team settings — hackathons, research, and open-source. My mission is to create ethical, inclusive technology that solves meaningful challenges.</p>
-                </div>
+                </SectionWrapper>
+                <SectionWrapper direction="right" delay={0.45}>
+                  <div className="space-y-4 text-gray-300 text-sm leading-relaxed">
+                    <p>I&apos;m Jishnudip Saha, an undergraduate student at Narula Institute of Technology, pursuing a degree in Data Science. I&apos;ve been passionate about using technology to solve real-world problems — from AI and embedded systems to full-stack development.</p>
+                    <p>My work focuses on building intelligent systems that bridge hardware and software. Notable projects include a robotic shoe polisher, a smart EEG-based headband, and ML models for eye disease prediction.</p>
+                    <p>I thrive in team settings — hackathons, research, and open-source. My mission is to create ethical, inclusive technology that solves meaningful challenges.</p>
+                  </div>
+                </SectionWrapper>
               </div>
             </div>
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="scale">
           <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Skills & Expertise
           </GradientText>
@@ -103,15 +107,16 @@ export default function AboutPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="scale">
           <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Technologies I Use
           </GradientText>
           <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3 mb-24">
-            {techStack.map((tech) => (
+            {techStack.map((tech, i) => (
               <span
                 key={tech}
-                className="px-4 py-2 text-sm rounded-full glass text-gray-300 border border-white/5 transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:bg-white/[0.06]"
+                style={{ animationDelay: `${i * 0.04}s` }}
+                className="px-4 py-2 text-sm rounded-full glass text-gray-300 border border-white/5 transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:bg-white/[0.06] animate-pop-in opacity-0"
               >
                 {tech}
               </span>
@@ -119,13 +124,13 @@ export default function AboutPage() {
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2}>
+        <SectionWrapper delay={0.2} direction="up">
           <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
             Education
           </GradientText>
           <div className="max-w-2xl mx-auto">
-            <div className="glass rounded-2xl p-8 gradient-border text-center transition-all duration-300 hover:-translate-y-1">
-              <GraduationCap className="w-10 h-10 text-purple-400 mx-auto mb-4" />
+            <div className="glass rounded-2xl p-8 gradient-border text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10">
+              <GraduationCap className="w-10 h-10 text-purple-400 mx-auto mb-4 animate-float" />
               <h3 className="text-xl font-bold mb-2">B.Tech in Computer Science (Data Science)</h3>
               <p className="text-purple-400 mb-1">Narula Institute of Technology</p>
               <p className="text-gray-500 text-sm">Expected 2027</p>
