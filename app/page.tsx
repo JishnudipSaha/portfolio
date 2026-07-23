@@ -1,9 +1,12 @@
 import Link from "next/link"
 import { ArrowRight, Download, Github, Linkedin, Mail, Code, Award, User, Briefcase, Terminal } from "lucide-react"
 import FloatingElements from "@/components/floating-elements"
+import CodeRain from "@/components/code-rain"
 import SectionWrapper from "@/components/section-wrapper"
 import GradientText from "@/components/gradient-text"
 import AnimatedCounter from "@/components/animated-counter"
+import RollingText from "@/components/rolling-text"
+import TerminalWindow from "@/components/terminal-window"
 
 const stats = [
   { label: "Projects", value: 10, suffix: "+", icon: Code },
@@ -16,17 +19,20 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-black">
       <FloatingElements />
+      <CodeRain />
 
-      <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/20 via-black to-blue-950/20 parallax-slow" />
         <div className="absolute inset-0 opacity-[0.015]" style={{
           backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
           backgroundSize: "40px 40px",
         }} />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           <SectionWrapper direction="scale">
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-purple-500/20 bg-purple-500/5 animate-float">
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-purple-500/20 bg-purple-500/5 animate-glow-pulse">
               <Terminal className="w-4 h-4 text-purple-400" />
               <span className="text-purple-400 text-xs font-mono tracking-wide">$ ./greet --world</span>
             </div>
@@ -39,8 +45,9 @@ export default function HomePage() {
           </h1>
 
           <SectionWrapper delay={0.2}>
-            <p className="text-lg sm:text-xl text-gray-300 mb-4">
-              Data Science Student & Developer
+            <p className="text-lg sm:text-xl text-gray-300 mb-4 font-mono">
+              <span className="text-purple-400/50">&gt; </span>
+              <RollingText />
             </p>
           </SectionWrapper>
 
@@ -98,7 +105,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-24 px-6">
+      <section className="relative py-24 px-6 z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-950/5 to-transparent" />
+        <div className="max-w-5xl mx-auto">
+          <SectionWrapper direction="scale">
+            <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-12">
+              Terminal
+            </GradientText>
+          </SectionWrapper>
+          <TerminalWindow className="max-w-2xl mx-auto" />
+        </div>
+      </section>
+
+      <section className="relative py-24 px-6 z-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-950/5 to-transparent" />
         <div className="max-w-6xl mx-auto">
           <SectionWrapper direction="scale">
             <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
@@ -122,7 +142,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-24 px-6 pb-32">
+      <section className="relative py-24 px-6 pb-32 z-10">
         <div className="max-w-4xl mx-auto">
           <SectionWrapper direction="scale">
             <GradientText className="text-3xl sm:text-4xl font-bold text-center mb-16">
@@ -138,7 +158,7 @@ export default function HomePage() {
               <SectionWrapper key={item.href} delay={i * 0.15} direction={i === 0 ? "left" : "right"}>
                 <Link href={item.href}>
                   <div className={`glass rounded-2xl p-8 bg-gradient-to-br ${item.from} to-transparent transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/[0.06]`}>
-                    <item.icon className="w-10 h-10 text-purple-400 mb-4" />
+                    <item.icon className="w-10 h-10 text-purple-400 mb-4 animate-float" />
                     <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                     <p className="text-sm text-gray-500">{item.desc}</p>
                   </div>
