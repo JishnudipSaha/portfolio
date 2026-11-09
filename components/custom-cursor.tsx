@@ -22,6 +22,24 @@ export default function CustomCursor() {
         isVisible.current = true
         smoothPos.current = { x: e.clientX, y: e.clientY }
       }
+      if (cursorRef.current && dotRef.current) {
+        cursorRef.current.style.opacity = "1"
+        dotRef.current.style.opacity = "1"
+      }
+    }
+
+    const handleMouseLeaveWindow = () => {
+      if (cursorRef.current && dotRef.current) {
+        cursorRef.current.style.opacity = "0"
+        dotRef.current.style.opacity = "0"
+      }
+    }
+
+    const handleMouseEnterWindow = () => {
+      if (cursorRef.current && dotRef.current) {
+        cursorRef.current.style.opacity = "1"
+        dotRef.current.style.opacity = "1"
+      }
     }
 
     const render = () => {
@@ -51,6 +69,8 @@ export default function CustomCursor() {
     }
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true })
+    document.documentElement.addEventListener("mouseleave", handleMouseLeaveWindow)
+    document.documentElement.addEventListener("mouseenter", handleMouseEnterWindow)
     rafId = requestAnimationFrame(render)
 
     const attachListeners = () => {
@@ -67,6 +87,8 @@ export default function CustomCursor() {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
+      document.documentElement.removeEventListener("mouseleave", handleMouseLeaveWindow)
+      document.documentElement.removeEventListener("mouseenter", handleMouseEnterWindow)
       cancelAnimationFrame(rafId)
       observer.disconnect()
     }
@@ -74,8 +96,16 @@ export default function CustomCursor() {
 
   return (
     <>
-      <div ref={cursorRef} className="custom-cursor hidden md:block" />
-      <div ref={dotRef} className="custom-cursor-dot hidden md:block" />
+      <div 
+        ref={cursorRef} 
+        style={{ zIndex: 2147483646, pointerEvents: "none" }}
+        className="custom-cursor hidden md:block" 
+      />
+      <div 
+        ref={dotRef} 
+        style={{ zIndex: 2147483647, pointerEvents: "none" }}
+        className="custom-cursor-dot hidden md:block" 
+      />
     </>
   )
 }

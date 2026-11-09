@@ -154,7 +154,7 @@ html {
 .custom-cursor {
   position: fixed;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 2147483646;
   width: 34px;
   height: 34px;
   border: 1.5px solid rgba(168, 85, 247, 0.45);
@@ -174,7 +174,7 @@ html {
 .custom-cursor-dot {
   position: fixed;
   pointer-events: none;
-  z-index: 10000;
+  z-index: 2147483647;
   width: 6px;
   height: 6px;
   background: linear-gradient(135deg, #a855f7, #06b6d4);

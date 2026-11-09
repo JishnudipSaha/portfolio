@@ -293,7 +293,7 @@ export default function AICopilot() {
             position: "fixed",
             bottom: "1.5rem",
             right: "1.5rem",
-            zIndex: 9999,
+            zIndex: 50,
           }}
           className="flex flex-col items-end gap-3 select-none pointer-events-auto"
         >
@@ -412,7 +412,7 @@ export default function AICopilot() {
             position: "fixed",
             bottom: "1.25rem",
             right: "1.25rem",
-            zIndex: 99999,
+            zIndex: 60,
             maxHeight: "calc(100dvh - 2.5rem)",
           }}
           className="w-[calc(100vw-2.5rem)] sm:w-[420px] max-w-[430px] h-[610px] flex flex-col rounded-2xl bg-[#080911]/95 border border-purple-500/30 shadow-2xl overflow-hidden backdrop-blur-2xl animate-scale-in"
