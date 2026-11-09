@@ -1,270 +1,325 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Send, Sparkles, Terminal } from "lucide-react"
+import { 
+  Mail, MapPin, Github, Linkedin, Twitter, Send, 
+  Sparkles, Terminal, Copy, Check, CheckCircle2, ShieldCheck, 
+  MessageSquare, Radio 
+} from "lucide-react"
 import CodeRain from "@/components/code-rain"
+import FloatingElements from "@/components/floating-elements"
 import SectionWrapper from "@/components/section-wrapper"
 import GradientText from "@/components/gradient-text"
+import ScrollToTop from "@/components/scroll-to-top"
+import { playKeyClick, playSuccessChime } from "@/components/sound-effects"
 
-const contactInfo = [
-  { icon: Mail, label: "Email", value: "jishnudip.saha.2004@gmail.com", href: "mailto:jishnudip.saha.2004@gmail.com" },
-  { icon: Phone, label: "Phone", value: "+91 9748612686", href: "tel:+919748612686" },
-  { icon: MapPin, label: "Location", value: "Kolkata, West Bengal, India", href: "#" },
+const contactCards = [
+  {
+    icon: Mail,
+    title: "Direct Email",
+    value: "jishnudip.saha.2004@gmail.com",
+    href: "mailto:jishnudip.saha.2004@gmail.com",
+    copyValue: "jishnudip.saha.2004@gmail.com",
+    label: "Primary Channel",
+  },
+  {
+    icon: MessageSquare,
+    title: "Response Window",
+    value: "Within 24 Hours",
+    href: "mailto:jishnudip.saha.2004@gmail.com",
+    label: "Available for Opportunities",
+  },
+  {
+    icon: MapPin,
+    title: "Current Base",
+    value: "Kolkata, West Bengal, India",
+    href: "#",
+    label: "Timezone: UTC+5:30",
+  },
 ]
 
 const socialLinks = [
-  { icon: Github, label: "GitHub", href: "https://github.com/JishnudipSaha" },
-  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/jishnudipsaha/" },
-  { icon: Twitter, label: "Twitter", href: "https://x.com/jishnudip" },
-  { icon: Mail, label: "Email", href: "mailto:jishnudip.saha.2004@gmail.com" },
+  { icon: Github, label: "GitHub", href: "https://github.com/JishnudipSaha", handle: "@JishnudipSaha" },
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/jishnudipsaha/", handle: "in/jishnudipsaha" },
+  { icon: Twitter, label: "Twitter / X", href: "https://x.com/jishnudip", handle: "@jishnudip" },
 ]
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" })
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [copiedItem, setCopiedItem] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleCopy = (text: string, title: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedItem(title)
+    playSuccessChime()
+    setTimeout(() => setCopiedItem(null), 1500)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus("loading")
-    const data = new FormData(e.target as HTMLFormElement)
-    const res = await fetch("https://formspree.io/f/mvgrvazg", {
-      method: "POST",
-      body: data,
-      headers: { Accept: "application/json" },
-    })
-    if (res.ok) {
-      setStatus("success")
-      setForm({ name: "", email: "", subject: "", message: "" })
-    } else {
+    playKeyClick()
+
+    try {
+      const data = new FormData(e.target as HTMLFormElement)
+      const res = await fetch("https://formspree.io/f/mvgrvazg", {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" },
+      })
+
+      if (res.ok) {
+        setStatus("success")
+        playSuccessChime()
+        setForm({ name: "", email: "", subject: "", message: "" })
+      } else {
+        setStatus("error")
+      }
+    } catch {
       setStatus("error")
     }
-    setTimeout(() => setStatus("idle"), 4000)
+
+    setTimeout(() => setStatus("idle"), 5000)
   }
 
   return (
-    <main className="min-h-screen bg-black pt-24 relative">
+    <main className="min-h-screen bg-[#050508] pt-28 pb-20 relative overflow-hidden text-slate-100">
+      <FloatingElements />
       <CodeRain />
+      <div className="fixed inset-0 cyber-grid pointer-events-none z-0" />
+      <div className="fixed top-1/4 right-10 w-[450px] h-[300px] bg-purple-600/10 blur-[130px] rounded-full pointer-events-none z-0" />
+      <div className="fixed bottom-1/4 left-10 w-[450px] h-[300px] bg-cyan-600/10 blur-[130px] rounded-full pointer-events-none z-0" />
 
-      <div className="relative z-10 px-6 pb-24">
+      <div className="relative z-10 px-6 max-w-6xl mx-auto">
+        {/* Header */}
         <SectionWrapper direction="scale">
-          <div className="max-w-6xl mx-auto text-center py-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full border border-purple-500/20 bg-purple-500/5">
-              <Terminal className="w-3 h-3 text-purple-400" />
-              <span className="font-mono text-[10px] text-purple-400/60">$ ./contact --init</span>
+          <div className="text-center py-10 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-4 rounded-full glass-panel border border-purple-500/20 text-purple-400 text-xs font-mono">
+              <Terminal className="w-3.5 h-3.5" />
+              <span>$ ./contact --handshake --secure</span>
             </div>
-            <GradientText as="h1" className="text-4xl sm:text-6xl font-bold mb-6">
+            <GradientText as="h1" className="text-4xl sm:text-6xl font-black mb-4">
               Get In Touch
             </GradientText>
-            <p className="text-gray-400 max-w-2xl mx-auto font-mono text-sm">
-              <span className="text-purple-400/50">// </span>
-              Let&apos;s collaborate and create something amazing together
+            <p className="text-gray-400 font-mono text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+              <span className="text-purple-400">// </span>
+              Have an opportunity, collaboration idea, or question? Send a message through the terminal dispatch below.
             </p>
           </div>
         </SectionWrapper>
 
-        <SectionWrapper delay={0.2} direction="none">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-3">
-              <SectionWrapper direction="left" delay={0.3}>
-                <div className="glass rounded-2xl overflow-hidden gradient-border">
-                  <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-                    <span className="text-gray-600 text-[10px] font-mono ml-2">terminal — contact-form</span>
+        {/* Contact Layout */}
+        <div className="grid lg:grid-cols-5 gap-8 mb-20">
+          {/* Left Form: Terminal Form Window */}
+          <div className="lg:col-span-3">
+            <SectionWrapper direction="left" delay={0.15}>
+              <div className="glass-panel rounded-2xl overflow-hidden border border-white/10 specular-border shadow-glass-lg">
+                {/* Window Bar */}
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                    <span className="text-gray-400 text-[11px] font-mono ml-2">
+                      terminal ~ send-message.sh
+                    </span>
                   </div>
-                  <div className="p-6 sm:p-8">
-                    <h2 className="text-xl font-bold mb-6 font-mono">
-                      <span className="text-green-400/60">$</span>{" "}
-                      <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                        ./send-message.sh
-                      </span>
-                    </h2>
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                      <div className="grid sm:grid-cols-2 gap-5">
-                        <div>
-                          <label className="block font-mono text-[10px] text-purple-400/60 mb-1.5">
-                            <span className="text-green-400/60">$</span> name <span className="text-gray-600">--required</span>
-                          </label>
-                          <input
-                            name="name" value={form.name} onChange={handleChange} required
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 transition-all duration-300 focus:scale-[1.01] font-mono"
-                            placeholder="Enter your name..."
-                          />
-                        </div>
-                        <div>
-                          <label className="block font-mono text-[10px] text-purple-400/60 mb-1.5">
-                            <span className="text-green-400/60">$</span> email <span className="text-gray-600">--required</span>
-                          </label>
-                          <input
-                            name="email" type="email" value={form.email} onChange={handleChange} required
-                            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 transition-all duration-300 focus:scale-[1.01] font-mono"
-                            placeholder="Enter your email..."
-                          />
-                        </div>
-                      </div>
+
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-400">
+                    <Radio className="w-3 h-3 animate-pulse" />
+                    <span>SSL/TLS ENCRYPTED</span>
+                  </div>
+                </div>
+
+                {/* Form Body */}
+                <div className="p-6 sm:p-8">
+                  <h2 className="text-lg font-bold mb-6 font-mono text-white flex items-center gap-2">
+                    <span className="text-emerald-400">$</span>
+                    <span>./dispatch-payload</span>
+                  </h2>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block font-mono text-[10px] text-purple-400/60 mb-1.5">
-                          <span className="text-green-400/60">$</span> subject <span className="text-gray-600">--required</span>
+                        <label className="block font-mono text-[11px] text-purple-300 mb-1.5">
+                          <span className="text-emerald-400 mr-1">$</span>
+                          your_name <span className="text-gray-500">--required</span>
                         </label>
                         <input
-                          name="subject" value={form.subject} onChange={handleChange} required
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 transition-all duration-300 focus:scale-[1.01] font-mono"
-                          placeholder="Enter subject..."
+                          name="name"
+                          value={form.name}
+                          onChange={handleChange}
+                          required
+                          placeholder="e.g. Alex Turing"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-xs font-mono text-white placeholder-gray-600 focus:outline-none focus:border-purple-400/60 focus:bg-white/[0.03] transition-all"
                         />
                       </div>
-                      <div>
-                        <label className="block font-mono text-[10px] text-purple-400/60 mb-1.5">
-                          <span className="text-green-400/60">$</span> message <span className="text-gray-600">--required</span>
-                        </label>
-                        <textarea
-                          name="message" value={form.message} onChange={handleChange} required rows={5}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 transition-all duration-300 focus:scale-[1.01] resize-none font-mono"
-                          placeholder="Enter your message..."
-                        />
-                      </div>
-                      <button
-                        type="submit" disabled={status === "loading"}
-                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-60 font-mono"
-                      >
-                        {status === "loading" ? (
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <><Send className="w-4 h-4" /> ./send-message.sh</>
-                        )}
-                      </button>
-                      {status === "success" && (
-                        <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20">
-                          <p className="text-green-400 text-xs text-center font-mono">
-                            <span className="text-green-400/60">$</span> Message sent successfully!
-                          </p>
-                        </div>
-                      )}
-                      {status === "error" && (
-                        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                          <p className="text-red-400 text-xs text-center font-mono">
-                            <span className="text-red-400/60">!</span> Something went wrong. Please try again.
-                          </p>
-                        </div>
-                      )}
-                    </form>
-                  </div>
-                </div>
-              </SectionWrapper>
-            </div>
 
-            <div className="lg:col-span-2 space-y-6">
-              <SectionWrapper direction="right" delay={0.4}>
-                <div className="glass rounded-2xl overflow-hidden gradient-border">
-                  <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-white/5 bg-white/[0.02]">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-                    <span className="text-gray-600 text-[10px] font-mono ml-2">contacts.json</span>
-                  </div>
-                  <div className="p-6 sm:p-8">
-                    <h2 className="text-xl font-bold mb-6 font-mono">
-                      <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                        contacts.json
-                      </span>
-                    </h2>
-                    <code className="text-[11px] font-mono text-gray-400 block leading-relaxed">
-                      <span className="text-purple-400/60">{`{`}</span>
-                      {contactInfo.map((info, i) => (
-                        <span key={info.label} className="block ml-4">
-                          <span className="text-blue-300">"{info.label.toLowerCase()}"</span>:{" "}
-                          <span className="text-green-300">"{info.value}"</span>
-                          {i < contactInfo.length - 1 ? "," : ""}
-                        </span>
-                      ))}
-                      <span className="text-purple-400/60">{`}`}</span>
-                    </code>
-                    <div className="mt-6 space-y-4">
-                      {contactInfo.map((info) => (
-                        <a key={info.label} href={info.href} className="flex items-center gap-4 group transition-all duration-300 hover:-translate-x-1">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-purple-500/25">
-                            <info.icon className="w-4 h-4 text-white" />
+                      <div>
+                        <label className="block font-mono text-[11px] text-purple-300 mb-1.5">
+                          <span className="text-emerald-400 mr-1">$</span>
+                          your_email <span className="text-gray-500">--required</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          required
+                          placeholder="alex@domain.com"
+                          className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-xs font-mono text-white placeholder-gray-600 focus:outline-none focus:border-purple-400/60 focus:bg-white/[0.03] transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[11px] text-purple-300 mb-1.5">
+                        <span className="text-emerald-400 mr-1">$</span>
+                        subject <span className="text-gray-500">--context</span>
+                      </label>
+                      <input
+                        name="subject"
+                        value={form.subject}
+                        onChange={handleChange}
+                        required
+                        placeholder="e.g. ML Internship / Project Collaboration"
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-xs font-mono text-white placeholder-gray-600 focus:outline-none focus:border-purple-400/60 focus:bg-white/[0.03] transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[11px] text-purple-300 mb-1.5">
+                        <span className="text-emerald-400 mr-1">$</span>
+                        message_body <span className="text-gray-500">--markdown</span>
+                      </label>
+                      <textarea
+                        name="message"
+                        value={form.message}
+                        onChange={handleChange}
+                        required
+                        rows={5}
+                        placeholder="Type your message here..."
+                        className="w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-xs font-mono text-white placeholder-gray-600 focus:outline-none focus:border-purple-400/60 focus:bg-white/[0.03] transition-all resize-none"
+                      />
+                    </div>
+
+                    {status === "success" && (
+                      <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Payload transmitted successfully. I will respond to your email promptly!</span>
+                      </div>
+                    )}
+
+                    {status === "error" && (
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono">
+                        Error transmitting message. Please email directly at jishnudip.saha.2004@gmail.com.
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={status === "loading"}
+                      className="w-full group inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-mono font-semibold text-xs shadow-glow-purple transition-all duration-300 hover:scale-[1.01] cursor-pointer disabled:opacity-50"
+                    >
+                      <Send className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      <span>{status === "loading" ? "Transmitting..." : "Send Payload"}</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </SectionWrapper>
+          </div>
+
+          {/* Right Cards: Direct Channels */}
+          <div className="lg:col-span-2 space-y-4">
+            <SectionWrapper direction="right" delay={0.2}>
+              <div className="space-y-4">
+                {contactCards.map((card) => {
+                  const Icon = card.icon
+                  const isCopied = copiedItem === card.title
+                  return (
+                    <div
+                      key={card.title}
+                      className="glass-card rounded-2xl p-5 border border-white/10 hover:border-purple-500/30"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+                            <Icon className="w-4 h-4" />
                           </div>
                           <div>
-                            <p className="text-[10px] text-gray-500 font-mono">{info.label.toLowerCase()}</p>
-                            <p className="text-sm text-white group-hover:text-purple-400 transition-colors font-mono">{info.value}</p>
+                            <span className="text-xs font-mono font-semibold text-white">
+                              {card.title}
+                            </span>
+                            <span className="block text-[10px] font-mono text-gray-500">
+                              {card.label}
+                            </span>
                           </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </SectionWrapper>
+                        </div>
 
-              <SectionWrapper direction="right" delay={0.55}>
-                <div className="glass rounded-2xl p-6 sm:p-8 gradient-border">
-                  <h2 className="text-xl font-bold mb-6 font-mono">
-                    <span className="text-green-400/60">$</span>{" "}
-                    <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                      connect
-                    </span>
-                  </h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {socialLinks.map((social, i) => (
+                        {card.copyValue && (
+                          <button
+                            onClick={() => handleCopy(card.copyValue!, card.title)}
+                            className="p-1.5 rounded-lg glass-pill text-gray-400 hover:text-white transition-colors cursor-pointer"
+                            title="Copy to clipboard"
+                          >
+                            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
+                      </div>
+
                       <a
-                        key={social.label}
-                        href={social.href}
-                        target="_blank" rel="noopener noreferrer"
-                        style={{ animationDelay: `${i * 0.08}s` }}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-300 hover:-translate-y-1 border border-white/5 animate-pop-in opacity-0 font-mono"
+                        href={card.href}
+                        className="text-xs font-mono text-purple-300 hover:text-cyan-300 transition-colors break-all"
                       >
-                        <social.icon className="w-4 h-4 text-purple-400" />
-                        <span className="text-xs font-medium">{social.label}</span>
+                        {card.value}
                       </a>
-                    ))}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-white/5">
-                    <p className="font-mono text-[9px] text-gray-600">
-                      <span className="text-purple-400/40">#</span> Available 24/7 for opportunities
-                    </p>
-                  </div>
-                </div>
-              </SectionWrapper>
-            </div>
-          </div>
-        </SectionWrapper>
-
-        <SectionWrapper delay={0.35} direction="scale">
-          <div className="max-w-3xl mx-auto mt-24">
-            <div className="glass rounded-3xl p-10 sm:p-14 text-center gradient-border">
-              <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-5 animate-float" />
-              <GradientText className="text-2xl sm:text-3xl font-bold mb-4">
-                Ready to Start a Project?
-              </GradientText>
-              <p className="text-sm text-gray-400 mb-8 max-w-md mx-auto font-mono">
-                <span className="text-purple-400/50">// </span>
-                I&apos;m always excited to collaborate. Let&apos;s discuss how we can bring your ideas to life.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:jishnudip.saha.2004@gmail.com"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105 font-mono"
-                >
-                  <Mail className="w-4 h-4" /> email me
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/jishnudipsaha/"
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-purple-500/30 text-purple-300 font-semibold text-sm transition-all duration-300 hover:bg-purple-500/10 hover:scale-105 font-mono"
-                >
-                  <Linkedin className="w-4 h-4" /> connect --platform=linkedin
-                </a>
+                    </div>
+                  )
+                })}
               </div>
-            </div>
+            </SectionWrapper>
+
+            {/* Social Grid */}
+            <SectionWrapper direction="right" delay={0.3}>
+              <div className="glass-panel rounded-2xl p-5 border border-white/10">
+                <h4 className="text-xs font-mono font-bold text-gray-300 mb-3 uppercase tracking-wider">
+                  Social Handshakes
+                </h4>
+                <div className="space-y-2">
+                  {socialLinks.map((s) => {
+                    const Icon = s.icon
+                    return (
+                      <a
+                        key={s.label}
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => playKeyClick()}
+                        className="flex items-center justify-between p-2.5 rounded-xl glass-pill text-xs font-mono text-gray-300 hover:text-white hover:border-purple-500/40 transition-all hover:bg-white/[0.04]"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Icon className="w-4 h-4 text-purple-400" />
+                          <span>{s.label}</span>
+                        </div>
+                        <span className="text-[11px] text-gray-500">{s.handle}</span>
+                      </a>
+                    )
+                  })}
+                </div>
+              </div>
+            </SectionWrapper>
           </div>
-        </SectionWrapper>
+        </div>
       </div>
+
+      <ScrollToTop />
     </main>
   )
 }

@@ -8,7 +8,7 @@ interface AnimatedCounterProps {
   duration?: number
 }
 
-export default function AnimatedCounter({ end, suffix = "", duration = 2 }: AnimatedCounterProps) {
+export default function AnimatedCounter({ end, suffix = "", duration = 1.8 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0)
   const [started, setStarted] = useState(false)
   const ref = useRef<HTMLSpanElement>(null)
@@ -23,7 +23,7 @@ export default function AnimatedCounter({ end, suffix = "", duration = 2 }: Anim
           observer.unobserve(el)
         }
       },
-      { threshold: 0.5 },
+      { threshold: 0.15 },
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -42,5 +42,5 @@ export default function AnimatedCounter({ end, suffix = "", duration = 2 }: Anim
     requestAnimationFrame(animate)
   }, [started, end, duration])
 
-  return <span ref={ref}>{count}{suffix}</span>
+  return <span ref={ref} className="font-mono" suppressHydrationWarning>{count}{suffix}</span>
 }
