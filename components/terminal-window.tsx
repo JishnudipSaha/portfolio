@@ -161,7 +161,7 @@ export default function TerminalWindow({ className = "" }: { className?: string 
       const query = cmd.trim().replace(/^(ask|ai|rag)\s+/i, "")
       const loadingEntry: CommandHistory = {
         command: cmd,
-        output: <span className="text-cyan-400 animate-pulse">⚡ Querying RAG knowledge base &amp; generating answer...</span>,
+        output: <span className="text-cyan-400 animate-pulse">⚡ Jishnu is retrieving context &amp; typing...</span>,
         timestamp: time,
       }
       setHistory((prev) => [...prev, loadingEntry])
@@ -213,7 +213,7 @@ export default function TerminalWindow({ className = "" }: { className?: string 
         output = (
           <div className="space-y-1 text-gray-300">
             <p className="text-purple-300">Available commands:</p>
-            <p><span className="text-cyan-400">ask &lt;prompt&gt;</span> - Ask anything to the RAG AI Knowledge Copilot (or use &apos;ai &lt;prompt&gt;&apos;)</p>
+            <p><span className="text-cyan-400">ask &lt;prompt&gt;</span> - Ask anything directly to Jishnudip&apos;s AI Twin (or use &apos;ai &lt;prompt&gt;&apos;)</p>
             <p><span className="text-cyan-400">skills</span> - List core languages and frameworks</p>
             <p><span className="text-cyan-400">projects</span> - View top highlighted software &amp; ML builds</p>
             <p><span className="text-cyan-400">about</span> - Read background and college info</p>

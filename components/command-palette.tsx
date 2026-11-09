@@ -71,8 +71,8 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
     },
     {
       id: "action-ai",
-      title: "Ask AI Jishnu (RAG Copilot)",
-      subtitle: "Ask questions about projects, stack, and availability (⌘J)",
+      title: "Chat with Jishnu (AI Twin)",
+      subtitle: "Ask me anything about my projects, skills & internships (⌘J)",
       category: "Actions",
       icon: Bot,
       action: () => {

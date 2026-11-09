@@ -43,7 +43,7 @@ export default function ScrollToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Scroll to top"
-      className="fixed bottom-6 right-6 z-40 group p-2 rounded-full glass-panel hover:border-purple-400/50 hover:shadow-glow-purple transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer"
+      className="fixed bottom-24 right-6 z-40 group p-2 rounded-full glass-panel hover:border-purple-400/50 hover:shadow-glow-purple transition-all duration-300 hover:scale-110 flex items-center justify-center cursor-pointer shadow-glass-lg"
     >
       <svg className="w-11 h-11 -rotate-90 pointer-events-none" viewBox="0 0 44 44">
         {/* Track */}

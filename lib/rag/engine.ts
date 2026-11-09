@@ -144,11 +144,11 @@ export function retrieveContext(query: string, topK = 4): RAGRetrievalResult[] {
 
 /**
  * Local Context Synthesis Engine:
- * Generates an accurate, professional answer when no LLM API key is configured.
+ * Generates an authentic, first-person response as Jishnudip Saha when no LLM API key is configured.
  */
 function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): string {
   if (retrieved.length === 0) {
-    return `I don't have specific information in my portfolio knowledge base about "${query}". You can ask me about Jishnudip's **skills** (Python, TypeScript, TensorFlow, Java), his **machine learning projects** (Movie Recommendation, Titanic Survival, Eye Disease Prediction), his **education** at Narula Institute of Technology, or how to **get in touch**!`
+    return `Hey! I don't have that specific topic documented in my portfolio records yet for "${query}". You can ask me about my **programming skills** (Python, TypeScript, Java, TensorFlow), my **machine learning projects** (like my Movie Recommender or Titanic Classifier), my **education** at Narula Institute of Technology, or how we can connect for **internships**!`
   }
 
   const queryLower = query.toLowerCase()
@@ -159,65 +159,65 @@ function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): 
     const skillChunks = retrieved.filter((r) => r.chunk.category === "skills")
     const chunks = skillChunks.length > 0 ? skillChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
     
-    return `Here is a breakdown of Jishnudip's technical capabilities:\n\n` +
+    return `Hey! Here is a breakdown of what I build with every day:\n\n` +
       chunks.map((c) => `### ⚡ ${c.title}\n${c.content}`).join("\n\n") +
-      `\n\n👉 You can interactively filter all 18+ technologies in the [Tech Stack Matrix](/about#skills) on the About page.`
+      `\n\n👉 You can interactively filter all 18+ technologies in my [Tech Stack Matrix](/about#skills) on the About page.`
   }
 
   if (queryLower.includes("project") || queryLower.includes("built") || queryLower.includes("work") || queryLower.includes("app")) {
     const projChunks = retrieved.filter((r) => r.chunk.category === "projects")
     const chunks = projChunks.length > 0 ? projChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
 
-    return `Here are the relevant projects from Jishnudip's engineering portfolio:\n\n` +
+    return `I'd love to share my engineering projects with you! Here are some of the key builds I've architected:\n\n` +
       chunks.map((c) => `### 🚀 [${c.title}](${c.link || "/projects"})\n${c.content}`).join("\n\n") +
-      `\n\n👉 Explore all repositories and live demos on the [Projects Showcase](/projects).`
+      `\n\n👉 You can explore all my repositories and test out live deployed demos in my [Projects Showcase](/projects).`
   }
 
-  if (queryLower.includes("contact") || queryLower.includes("email") || queryLower.includes("hire") || queryLower.includes("reach") || queryLower.includes("message")) {
-    return `### 📬 Getting in Touch with Jishnudip\n\n` +
-      `* **Direct Email:** [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com) *(guaranteed reply within 24 hours)*\n` +
-      `* **Status:** 🟢 **Actively available** for software engineering & data science internships and impactful collaborations.\n` +
+  if (queryLower.includes("contact") || queryLower.includes("email") || queryLower.includes("hire") || queryLower.includes("reach") || queryLower.includes("message") || queryLower.includes("available")) {
+    return `### 📬 Let's Connect!\n\n` +
+      `I am **actively seeking software engineering & data science internships** and high-impact technical collaborations. I'd love to discuss opportunities with your team!\n\n` +
+      `* **Email:** [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com) *(I respond within 24 hours)*\n` +
       `* **GitHub:** [github.com/JishnudipSaha](https://github.com/JishnudipSaha)\n` +
       `* **LinkedIn:** [linkedin.com/in/jishnudipsaha](https://www.linkedin.com/in/jishnudipsaha/)\n` +
       `* **Location:** Kolkata, West Bengal, India (UTC+5:30)\n\n` +
-      `👉 You can dispatch a secure message directly using the [Contact Terminal](/contact).`
+      `👉 You can also dispatch a direct message to me right from my [Contact Terminal](/contact).`
   }
 
   if (queryLower.includes("education") || queryLower.includes("college") || queryLower.includes("university") || queryLower.includes("degree")) {
-    return `### 🎓 Academic Background\n\n` +
-      top.content +
-      `\n\n* **Expected Graduation:** 2027\n` +
-      `* **Specialization:** Machine Learning, Statistical Modeling, and Distributed Systems.\n\n` +
-      `👉 Learn more on the [About Page](/about).`
+    return `### 🎓 My Academic Background\n\n` +
+      `I'm currently in my B.Tech program in Computer Science & Engineering (specializing in Data Science) at **Narula Institute of Technology**, graduating in 2027.\n\n` +
+      `My coursework emphasizes Machine Learning, Deep Learning, Statistical Analysis, Algorithms, and Distributed Systems.\n\n` +
+      `👉 Learn more about my journey on my [About Page](/about).`
   }
 
   if (queryLower.includes("achievement") || queryLower.includes("certification") || queryLower.includes("cert") || queryLower.includes("medal") || queryLower.includes("award")) {
     const certChunks = retrieved.filter((r) => r.chunk.category === "achievements")
     const chunks = certChunks.length > 0 ? certChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
 
-    return `### 🏆 Key Achievements & Credentials\n\n` +
+    return `### 🏆 Honors & Verified Credentials\n\n` +
+      `Here are some recognitions I've earned:\n\n` +
       chunks.map((c) => `* **${c.title}**\n  ${c.content}`).join("\n\n") +
-      `\n\n👉 View verified certificate credential IDs on the [Achievements Page](/achievements).`
+      `\n\n👉 You can verify my credential IDs directly on my [Achievements Page](/achievements).`
   }
 
   if (queryLower.includes("resume") || queryLower.includes("cv")) {
-    return `### 📄 Jishnudip's Resume / CV\n\n` +
-      `You can download his official up-to-date resume in PDF format:\n\n` +
+    return `### 📄 My Resume & CV\n\n` +
+      `You can download a clean PDF copy of my latest resume right here:\n\n` +
       `📥 **[Download Jishnudip Saha CV (PDF)](/Jishnudip%20Saha%20CV.pdf)**\n\n` +
-      `It includes comprehensive details on his academic record, data science projects, certifications, and technical stack.`
+      `It includes comprehensive details on my data science projects, technical proficiencies, education, and credentials.`
   }
 
   // General synthesized answer from retrieved chunks
   const primaryChunk = retrieved[0].chunk
   const secondaryChunk = retrieved[1]?.chunk
 
-  let answer = `Based on Jishnudip's portfolio records regarding **${primaryChunk.title}**:\n\n${primaryChunk.content}`
+  let answer = `Regarding **${primaryChunk.title}**, here is what I can share from my experience:\n\n${primaryChunk.content}`
   if (secondaryChunk && secondaryChunk.id !== primaryChunk.id) {
-    answer += `\n\nAdditionally, concerning **${secondaryChunk.title}**:\n${secondaryChunk.content}`
+    answer += `\n\nAlso, on **${secondaryChunk.title}**:\n${secondaryChunk.content}`
   }
 
   if (primaryChunk.link) {
-    answer += `\n\n👉 Related link: [${primaryChunk.title}](${primaryChunk.link})`
+    answer += `\n\n👉 Feel free to explore: [${primaryChunk.title}](${primaryChunk.link})`
   }
 
   return answer
@@ -232,17 +232,17 @@ async function callGeminiRAG(query: string, retrieved: RAGRetrievalResult[], api
     .join("\n\n")
 
   const systemInstruction = 
-    `You are the official AI Assistant for Jishnudip Saha's developer portfolio website. ` +
-    `Your goal is to answer visitor, recruiter, and developer questions accurately, professionally, and enthusiastically ` +
-    `using the provided retrieved context. ` +
-    `Guidelines:\n` +
-    `- Base your answers strictly on the provided portfolio documents.\n` +
-    `- Maintain a friendly, confident developer persona.\n` +
-    `- Format responses in clean markdown with bullet points, bold tags, and clickable links where relevant.\n` +
-    `- If information is not in the context, politely state so and suggest reaching out to Jishnudip at jishnudip.saha.2004@gmail.com.\n` +
-    `- Highlight Jishnudip's readiness for software engineering and data science internships.`
+    `You ARE Jishnudip Saha himself, chatting directly with visitors, tech recruiters, and engineering leaders who are browsing your personal portfolio website.\n\n` +
+    `CRITICAL PERSONA RULES:\n` +
+    `1. ALWAYS speak in the first person ("I", "my", "me"). NEVER speak as a third party or refer to "Jishnudip" as someone else.\n` +
+    `2. Persona: You are an ambitious, intelligent, warm, and humble 3rd-year Data Science undergraduate at Narula Institute of Technology (graduating in 2027) with strong hands-on expertise in Python, TensorFlow, Scikit-learn, TypeScript, Next.js, and Java.\n` +
+    `3. Conversational style: Friendly, articulate, energetic, and developer-savvy. Use natural conversational openings ("Hey there!", "Thanks for asking!", "That's one of my favorite projects!").\n` +
+    `4. Grounding: Answer strictly using facts from the provided portfolio context. Highlight your real metrics, datasets used (TMDB, OCT retinal scans, etc.), and technologies.\n` +
+    `5. Internships & Hiring: Always emphasize that you are actively seeking and excited for software engineering and data science internships!\n` +
+    `6. If something is unknown or not in context: Say warmly "I haven't posted that on my portfolio yet, but drop me an email at jishnudip.saha.2004@gmail.com and let's talk about it!"\n` +
+    `7. Format: Use clean GitHub markdown, bold highlights, concise bullet points, and markdown links to pages.`
 
-  const prompt = `Retrieved Portfolio Context:\n${contextText}\n\nUser Question:\n${query}\n\nPlease provide a helpful, concise answer based on the context above:`
+  const prompt = `Retrieved Portfolio Context:\n${contextText}\n\nVisitor's Message:\n${query}\n\nReply as Jishnudip:`
 
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
 
@@ -253,7 +253,7 @@ async function callGeminiRAG(query: string, retrieved: RAGRetrievalResult[], api
       contents: [{ parts: [{ text: prompt }] }],
       systemInstruction: { parts: [{ text: systemInstruction }] },
       generationConfig: {
-        temperature: 0.3,
+        temperature: 0.35,
         maxOutputTokens: 600,
       },
     }),

@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react"
 import { 
-  Bot, Sparkles, X, Send, RotateCcw, ChevronDown, ChevronUp, 
-  ExternalLink, Terminal, Copy, Check, MessageSquare, Zap
+  X, Send, RotateCcw, ChevronDown, ChevronUp, 
+  ExternalLink, Copy, Check, Sparkles,
+  CheckCircle2, FileText, Mail, ArrowUpRight, MessageCircle
 } from "lucide-react"
 import { KnowledgeChunk } from "@/lib/rag/knowledge"
 import { playKeyClick, playSuccessChime } from "./sound-effects"
@@ -17,14 +18,18 @@ interface Message {
 }
 
 const suggestedPrompts = [
-  "What are Jishnu's strongest skills?",
-  "Show me his machine learning projects",
-  "What certifications does he hold?",
-  "Is he available for internships?",
+  "👋 What are your strongest skills?",
+  "🚀 Tell me about your Movie Recommender",
+  "💼 Are you available for internships?",
+  "🎓 Where do you study and graduate?",
+  "🏆 What certifications do you hold?",
+  "📄 Can I see your resume?",
+  "📬 How can we get in touch?",
 ]
 
 export default function AICopilot() {
   const [isOpen, setIsOpen] = useState(false)
+  const [showTeaser, setShowTeaser] = useState(true)
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -34,33 +39,43 @@ export default function AICopilot() {
     {
       id: "welcome-msg",
       role: "assistant",
-      content: "Hello! I am **Jishnu's AI Assistant**, powered by a local Retrieval-Augmented Generation (RAG) engine. Ask me anything about his technical stack, machine learning projects, education, or availability!",
-      timestamp: "Now",
+      content: "Hey there! 👋 I'm **Jishnudip Saha**. Welcome to my portfolio!\n\nI built this interactive AI twin using RAG so you can chat with me directly in real-time. Feel free to ask me anything about my **machine learning projects**, **technical skills**, my studies at **Narula Institute of Technology**, or **internship opportunities**!\n\nWhat would you like to know?",
+      timestamp: "Just now",
     },
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Focus input on open
   useEffect(() => {
     if (isOpen) {
+      setShowTeaser(false)
       setTimeout(() => inputRef.current?.focus(), 150)
     }
   }, [isOpen])
 
+  // Scroll to bottom when messages update
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, loading])
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages, loading, isOpen])
 
-  // Global Ctrl+J / Cmd+J shortcut to toggle AI copilot & custom event listener
+  // Global keyboard shortcuts (Cmd+J / Ctrl+J, Esc) & custom event listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
         e.preventDefault()
         setIsOpen((prev) => !prev)
         playKeyClick()
+      } else if (e.key === "Escape" && isOpen) {
+        e.preventDefault()
+        setIsOpen(false)
+        playKeyClick()
       }
     }
+
     const handleOpenEvent = () => {
       setIsOpen(true)
       playKeyClick()
@@ -72,7 +87,7 @@ export default function AICopilot() {
       window.removeEventListener("keydown", handleKeyDown)
       window.removeEventListener("open-ai-copilot", handleOpenEvent)
     }
-  }, [])
+  }, [isOpen])
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || input
@@ -106,7 +121,7 @@ export default function AICopilot() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.answer || "I received an empty response from the RAG engine.",
+        content: data.answer || "I received an empty response. Feel free to ask another question!",
         sources: data.sources || [],
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
@@ -119,7 +134,7 @@ export default function AICopilot() {
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: "Sorry, I had trouble reaching the portfolio knowledge base. Please feel free to email Jishnudip directly at [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com).",
+          content: "Sorry, I had a momentary connection hiccup! You can reach out to me directly at [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com) or ping me on [LinkedIn](https://www.linkedin.com/in/jishnudipsaha/).",
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ])
@@ -140,18 +155,18 @@ export default function AICopilot() {
   }
 
   const resetChat = () => {
+    playKeyClick()
     setMessages([
       {
         id: "welcome-msg",
         role: "assistant",
-        content: "Chat history cleared. What would you like to know about Jishnudip?",
-        timestamp: "Now",
+        content: "Chat refreshed! Hey, I'm Jishnudip. What project, technical topic, or opportunity would you like to explore together?",
+        timestamp: "Just now",
       },
     ])
-    playKeyClick()
   }
 
-  // Render markdown formatting simply (links, bold, code)
+  // Render markdown formatting simply (links, bold, bullet points, headers)
   const renderFormatted = (text: string) => {
     const lines = text.split("\n")
     return (
@@ -162,7 +177,7 @@ export default function AICopilot() {
           // Headers
           if (line.startsWith("### ")) {
             return (
-              <h4 key={lIdx} className="font-mono font-bold text-sm text-cyan-300 mt-2 mb-1">
+              <h4 key={lIdx} className="font-mono font-bold text-sm text-cyan-300 mt-2.5 mb-1 flex items-center gap-1.5">
                 {line.replace("### ", "")}
               </h4>
             )
@@ -185,7 +200,7 @@ export default function AICopilot() {
                   href={url}
                   target={url.startsWith("http") ? "_blank" : undefined}
                   rel={url.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-0.5"
+                  className="text-cyan-400 hover:text-cyan-300 underline font-medium inline-flex items-center gap-0.5 mx-0.5"
                 >
                   {label}
                   {url.startsWith("http") && <ExternalLink className="w-2.5 h-2.5 inline" />}
@@ -203,8 +218,8 @@ export default function AICopilot() {
           })
 
           return isBullet ? (
-            <div key={lIdx} className="flex items-start gap-1.5 pl-2 text-gray-300">
-              <span className="text-purple-400 font-bold">•</span>
+            <div key={lIdx} className="flex items-start gap-1.5 pl-1.5 text-gray-200">
+              <span className="text-cyan-400 font-bold shrink-0 mt-0.5">•</span>
               <span>{renderedLine}</span>
             </div>
           ) : (
@@ -219,33 +234,110 @@ export default function AICopilot() {
 
   return (
     <>
-      {/* Floating Toggle Button (Bottom Left) */}
-      <div className="fixed bottom-6 left-6 z-40">
+      {/* ========================================================= */}
+      {/* FLOATING RIGHT-SIDE LAUNCHER & TEASER */}
+      {/* ========================================================= */}
+      <div className="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 select-none pointer-events-none">
+        {/* Irresistible Teaser Speech Bubble (Visible when chat is closed) */}
+        {!isOpen && showTeaser && (
+          <div className="pointer-events-auto max-w-[290px] sm:max-w-[320px] glass-panel border border-purple-500/30 rounded-2xl p-3.5 shadow-2xl shadow-purple-950/40 relative animate-fade-in group hover:border-cyan-400/50 transition-all duration-300 backdrop-blur-xl">
+            {/* Dismiss button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowTeaser(false)
+              }}
+              aria-label="Dismiss greeting"
+              className="absolute top-2 right-2 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <X className="w-3 h-3" />
+            </button>
+
+            {/* Clickable Card Body */}
+            <div
+              onClick={() => {
+                playKeyClick()
+                setIsOpen(true)
+              }}
+              className="cursor-pointer flex items-start gap-3"
+            >
+              {/* Jishnu Avatar with live indicator */}
+              <div className="relative shrink-0 mt-0.5">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400/70 shadow-glow-purple">
+                  <img
+                    src="/placeholder-user.jpg"
+                    alt="Jishnudip Saha"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#050508] animate-pulse" />
+              </div>
+
+              {/* Teaser Content */}
+              <div className="flex-1 pr-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-xs font-bold font-mono text-white flex items-center gap-1">
+                    Jishnudip Saha
+                    <CheckCircle2 className="w-3 h-3 text-cyan-400" />
+                  </span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    Online
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-300 leading-snug">
+                  Hey! Ask me anything about my ML projects, technical stack, or internship availability 👋
+                </p>
+                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-cyan-400 font-medium">
+                  <span className="flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Chat with me</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </span>
+                  <span className="text-gray-500">⌘J</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Downward pointing speech bubble pip */}
+            <div className="absolute -bottom-1.5 right-7 w-3 h-3 bg-[#0d0e15] border-r border-b border-purple-500/30 rotate-45" />
+          </div>
+        )}
+
+        {/* Floating Right-Side Launcher Pill */}
         {!isOpen && (
           <button
             onClick={() => {
               playKeyClick()
               setIsOpen(true)
             }}
-            aria-label="Ask AI Assistant"
-            className="group flex items-center gap-2.5 px-4 py-2.5 rounded-full glass-panel border border-purple-500/30 hover:border-cyan-400/60 shadow-glass-lg hover:shadow-glow-cyan transition-all duration-300 hover:scale-105 cursor-pointer specular-border"
+            aria-label="Chat with Jishnu"
+            className="pointer-events-auto group relative flex items-center gap-3 px-3.5 py-2.5 rounded-full glass-panel border border-purple-500/40 hover:border-cyan-400/80 shadow-2xl hover:shadow-glow-cyan transition-all duration-300 hover:scale-105 cursor-pointer specular-border"
           >
-            <div className="relative">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center text-black">
-                <Bot className="w-4 h-4 text-black" />
+            {/* Jishnu Avatar */}
+            <div className="relative shrink-0">
+              <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-purple-400 group-hover:border-cyan-400 transition-colors">
+                <img
+                  src="/placeholder-user.jpg"
+                  alt="Jishnudip Saha"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#050508] animate-ping" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#050508]" />
             </div>
 
+            {/* Label */}
             <div className="flex flex-col text-left">
-              <span className="text-xs font-mono font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-1">
-                <span>Ask AI Jishnu</span>
-                <Sparkles className="w-3 h-3 text-cyan-400" />
+              <span className="text-xs font-mono font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+                <span>Chat with Jishnu</span>
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
               </span>
-              <span className="text-[10px] font-mono text-gray-400">RAG Knowledge Copilot</span>
+              <span className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>AI Twin • Ready to chat</span>
+              </span>
             </div>
 
+            {/* Keyboard shortcut */}
             <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded ml-1">
               ⌘J
             </kbd>
@@ -253,28 +345,45 @@ export default function AICopilot() {
         )}
       </div>
 
-      {/* Expandable Chat Window */}
+      {/* ========================================================= */}
+      {/* EXPANDABLE CHAT WINDOW (RIGHT-SIDE ANCHORED) */}
+      {/* ========================================================= */}
       {isOpen && (
-        <div className="fixed bottom-6 left-6 z-50 w-[92vw] sm:w-[420px] max-h-[580px] h-[550px] flex flex-col rounded-2xl glass-panel border border-white/10 shadow-2xl overflow-hidden specular-border animate-scale-in">
-          {/* Header Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-black/40 border-b border-white/10">
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+        <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-50 w-[94vw] sm:w-[430px] h-[600px] max-h-[86vh] flex flex-col rounded-2xl glass-panel border border-white/10 shadow-2xl overflow-hidden specular-border backdrop-blur-2xl animate-scale-in">
+          {/* Top Bar / Mac OS Style Controls */}
+          <div className="flex items-center justify-between px-4 py-2.5 bg-black/50 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors" />
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors" />
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-mono font-semibold text-white">
-                <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                <span>rag-copilot // AI Jishnu</span>
-              </div>
+              <span className="text-[11px] font-mono text-gray-400 border-l border-white/10 pl-2">
+                jishnu.ai // twin
+              </span>
             </div>
 
-            <div className="flex items-center gap-1">
+            {/* Quick Action Icons */}
+            <div className="flex items-center gap-1.5">
+              <a
+                href="/Jishnudip%20Saha%20CV.pdf"
+                download
+                title="Download Jishnu's CV"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="mailto:jishnudip.saha.2004@gmail.com"
+                title="Email Jishnudip"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <Mail className="w-3.5 h-3.5" />
+              </a>
               <button
                 onClick={resetChat}
-                className="p-1 rounded text-gray-400 hover:text-white transition-colors cursor-pointer"
-                title="Reset conversation"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                title="Restart conversation"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -283,21 +392,44 @@ export default function AICopilot() {
                   playKeyClick()
                   setIsOpen(false)
                 }}
-                className="p-1 rounded text-gray-400 hover:text-white transition-colors cursor-pointer"
-                title="Close chat"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                title="Close chat (Esc)"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Subheader / Status */}
-          <div className="px-4 py-1.5 bg-white/[0.02] border-b border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-400">
-            <span className="flex items-center gap-1">
+          {/* Profile Identity Bar */}
+          <div className="px-4 py-3 bg-gradient-to-r from-purple-950/40 via-[#0a0a14] to-cyan-950/40 border-b border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="relative shrink-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 shadow-glow-purple">
+                  <img
+                    src="/placeholder-user.jpg"
+                    alt="Jishnudip Saha"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0a0a14] animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-sm font-mono font-bold text-white leading-none">
+                    Jishnudip Saha
+                  </h3>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+                </div>
+                <p className="text-[11px] text-gray-400 font-mono mt-0.5">
+                  B.Tech Data Science &apos;27 • Kolkata, IN
+                </p>
+              </div>
+            </div>
+
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Vector Store: 20 Chunks Loaded</span>
+              Available for Internships
             </span>
-            <span className="text-purple-400">Contextual RAG</span>
           </div>
 
           {/* Messages Scroll Area */}
@@ -309,93 +441,120 @@ export default function AICopilot() {
               return (
                 <div
                   key={msg.id}
-                  className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
+                  className={`flex items-start gap-2.5 ${isUser ? "flex-row-reverse" : "flex-row"}`}
                 >
-                  <div
-                    className={`max-w-[88%] rounded-2xl p-3.5 ${
-                      isUser
-                        ? "bg-gradient-to-r from-purple-600/40 to-cyan-600/40 border border-purple-500/30 text-white rounded-br-none"
-                        : "glass-card border border-white/10 text-gray-200 rounded-bl-none"
-                    }`}
-                  >
-                    {isUser ? (
-                      <p className="font-mono text-xs">{msg.content}</p>
-                    ) : (
-                      <div>{renderFormatted(msg.content)}</div>
-                    )}
+                  {/* Avatar Icon */}
+                  {!isUser ? (
+                    <div className="w-7 h-7 rounded-full overflow-hidden border border-purple-400/60 shrink-0 mt-1">
+                      <img
+                        src="/placeholder-user.jpg"
+                        alt="Jishnudip"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-purple-600/30 border border-purple-400/50 flex items-center justify-center shrink-0 text-[10px] font-mono text-purple-200 mt-1">
+                      YOU
+                    </div>
+                  )}
 
-                    {/* Sources drawer for assistant answers */}
-                    {!isUser && msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-white/5">
+                  <div className={`max-w-[84%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
+                    <div
+                      className={`rounded-2xl p-3.5 ${
+                        isUser
+                          ? "bg-gradient-to-r from-purple-600/50 to-indigo-600/50 border border-purple-500/30 text-white rounded-tr-none shadow-md"
+                          : "glass-card border border-white/10 text-gray-200 rounded-tl-none shadow-md"
+                      }`}
+                    >
+                      {isUser ? (
+                        <p className="font-mono text-xs">{msg.content}</p>
+                      ) : (
+                        <div>{renderFormatted(msg.content)}</div>
+                      )}
+
+                      {/* Sources drawer for assistant answers */}
+                      {!isUser && msg.sources && msg.sources.length > 0 && (
+                        <div className="mt-2.5 pt-2 border-t border-white/5">
+                          <button
+                            onClick={() => toggleSource(msg.id)}
+                            className="flex items-center gap-1 text-[10px] font-mono text-purple-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                          >
+                            <span>📚 Verified from portfolio knowledge ({msg.sources.length})</span>
+                            {isSourceExpanded ? (
+                              <ChevronUp className="w-3 h-3" />
+                            ) : (
+                              <ChevronDown className="w-3 h-3" />
+                            )}
+                          </button>
+
+                          {isSourceExpanded && (
+                            <div className="mt-2 space-y-1.5 pl-1 animate-fade-in">
+                              {msg.sources.map((s) => (
+                                <div
+                                  key={s.id}
+                                  className="p-2 rounded-lg bg-black/40 border border-white/5 text-[10px] font-mono text-gray-400"
+                                >
+                                  <div className="text-cyan-300 font-semibold flex items-center justify-between">
+                                    <span>{s.title}</span>
+                                    {s.link && (
+                                      <a
+                                        href={s.link}
+                                        className="text-purple-400 hover:underline flex items-center gap-0.5"
+                                      >
+                                        open &rarr;
+                                      </a>
+                                    )}
+                                  </div>
+                                  <p className="text-gray-500 text-[9px] mt-0.5 line-clamp-2">
+                                    {s.content}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-1 px-1 text-[10px] font-mono text-gray-500">
+                      <span>{msg.timestamp}</span>
+                      {!isUser && (
                         <button
-                          onClick={() => toggleSource(msg.id)}
-                          className="flex items-center gap-1 text-[10px] font-mono text-purple-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                          onClick={() => copyAnswer(msg.content, msg.id)}
+                          className="hover:text-gray-300 transition-colors cursor-pointer"
+                          title="Copy message"
                         >
-                          <span>📚 {msg.sources.length} Retrieved Sources</span>
-                          {isSourceExpanded ? (
-                            <ChevronUp className="w-3 h-3" />
+                          {copiedId === msg.id ? (
+                            <Check className="w-3 h-3 text-emerald-400" />
                           ) : (
-                            <ChevronDown className="w-3 h-3" />
+                            <Copy className="w-3 h-3" />
                           )}
                         </button>
-
-                        {isSourceExpanded && (
-                          <div className="mt-2 space-y-1.5 pl-1 animate-fade-in">
-                            {msg.sources.map((s) => (
-                              <div
-                                key={s.id}
-                                className="p-2 rounded-lg bg-black/40 border border-white/5 text-[10px] font-mono text-gray-400"
-                              >
-                                <div className="text-cyan-300 font-semibold flex items-center justify-between">
-                                  <span>{s.title}</span>
-                                  {s.link && (
-                                    <a
-                                      href={s.link}
-                                      className="text-purple-400 hover:underline"
-                                    >
-                                      view &rarr;
-                                    </a>
-                                  )}
-                                </div>
-                                <p className="text-gray-500 text-[9px] mt-0.5 line-clamp-2">
-                                  {s.content}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 mt-1 px-1 text-[10px] font-mono text-gray-500">
-                    <span>{msg.timestamp}</span>
-                    {!isUser && (
-                      <button
-                        onClick={() => copyAnswer(msg.content, msg.id)}
-                        className="hover:text-gray-300 transition-colors cursor-pointer"
-                        title="Copy answer"
-                      >
-                        {copiedId === msg.id ? (
-                          <Check className="w-3 h-3 text-emerald-400" />
-                        ) : (
-                          <Copy className="w-3 h-3" />
-                        )}
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               )
             })}
 
+            {/* Loading Indicator */}
             {loading && (
-              <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 glass-card p-3 rounded-2xl w-fit">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]" />
+              <div className="flex items-start gap-2.5">
+                <div className="w-7 h-7 rounded-full overflow-hidden border border-purple-400/60 shrink-0 mt-1">
+                  <img
+                    src="/placeholder-user.jpg"
+                    alt="Jishnudip"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <span>Retrieving context &amp; generating...</span>
+                <div className="glass-card border border-white/10 rounded-2xl rounded-tl-none p-3 text-xs font-mono text-cyan-400 flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce [animation-delay:0.2s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:0.4s]" />
+                  </div>
+                  <span>Jishnu is thinking &amp; typing...</span>
+                </div>
               </div>
             )}
 
@@ -403,13 +562,13 @@ export default function AICopilot() {
           </div>
 
           {/* Quick Prompts Chips */}
-          <div className="px-3 py-1.5 bg-black/20 border-t border-white/5 overflow-x-auto flex gap-1.5 scrollbar-none">
+          <div className="px-3 py-2 bg-black/30 border-t border-white/5 overflow-x-auto flex gap-1.5 scrollbar-none">
             {suggestedPrompts.map((prompt) => (
               <button
                 key={prompt}
                 onClick={() => handleSend(prompt)}
                 disabled={loading}
-                className="whitespace-nowrap px-2.5 py-1 rounded-full glass-pill text-[10px] font-mono text-gray-400 hover:text-white hover:border-purple-500/40 transition-all cursor-pointer disabled:opacity-50"
+                className="whitespace-nowrap px-2.5 py-1 rounded-full glass-pill text-[10px] font-mono text-gray-300 hover:text-white hover:border-cyan-400/50 hover:bg-cyan-500/10 transition-all cursor-pointer disabled:opacity-50 shrink-0"
               >
                 {prompt}
               </button>
@@ -422,27 +581,34 @@ export default function AICopilot() {
               e.preventDefault()
               handleSend()
             }}
-            className="p-3 bg-black/40 border-t border-white/10 flex items-center gap-2"
+            className="p-3 bg-black/50 border-t border-white/10 flex items-center gap-2"
           >
-            <div className="relative flex-1 flex items-center">
-              <span className="text-purple-400 font-mono text-xs pl-2.5 pr-1">$</span>
+            <div className="relative flex-1 flex items-center bg-white/[0.03] border border-white/10 rounded-xl focus-within:border-cyan-400/60 transition-colors">
+              <span className="text-cyan-400 font-mono text-xs pl-3 pr-1 select-none">&gt;</span>
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about projects, skills, resume..."
-                className="w-full bg-transparent text-white font-mono text-xs py-2 pr-2 focus:outline-none placeholder-gray-500"
+                placeholder="Ask Jishnu anything (e.g. skills, projects)..."
+                className="w-full bg-transparent text-white font-mono text-xs py-2 pr-3 focus:outline-none placeholder-gray-500"
               />
             </div>
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="p-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 text-white hover:scale-105 transition-all duration-200 disabled:opacity-40 cursor-pointer shadow-glow-cyan"
+              aria-label="Send message to Jishnu"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-40 cursor-pointer shadow-glow-cyan shrink-0"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
           </form>
+
+          {/* Subtext info */}
+          <div className="px-4 py-1 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-gray-500">
+            <span>Press Enter to send</span>
+            <span>⌘J or Esc to close</span>
+          </div>
         </div>
       )}
     </>
