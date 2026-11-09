@@ -20,13 +20,14 @@ interface Message {
 }
 
 const suggestedPrompts = [
-  "👋 What are your strongest skills?",
-  "🚀 Tell me about your Movie Recommender",
-  "💼 Are you available for internships?",
-  "🎓 Where do you study and graduate?",
+  "🎓 What is your academic background & CGPA?",
+  "⚡ What are your core technical skills?",
+  "🚀 Tell me about your Smart Attendance project",
+  "📊 How did you use DVC in the Titanic project?",
+  "💼 What internships have you completed?",
   "🏆 What certifications do you hold?",
   "📄 Can I see your resume?",
-  "📬 How can we get in touch?",
+  "📬 How can we connect for an internship?",
 ]
 
 export default function AICopilot() {
@@ -47,7 +48,7 @@ export default function AICopilot() {
     {
       id: "welcome-msg",
       role: "assistant",
-      content: "Hey there! 👋 I'm **Jishnudip Saha**. Welcome to my portfolio!\n\nI built this interactive AI twin so you can chat with me directly in real-time. Feel free to ask me anything about my **machine learning projects**, **technical skills**, my studies at **Narula Institute of Technology**, or **internship opportunities**!\n\nWhat would you like to explore together?",
+      content: "Hey there! 👋 I'm **Jishnudip Saha**. Welcome to my portfolio!\n\nI built this interactive AI twin grounded strictly on my **verified CV, academics, and projects**. Feel free to ask me anything about my **machine learning projects** (OCT Eye Disease, DVC Titanic, Smart Attendance), **academics at Narula Institute of Technology (CGPA: 8.08)**, **internships at EdiGlobe & ShadowFox**, or **internship opportunities**!\n\n*(Note: I am exclusively programmed to answer questions about my CV, academics, and projects.)*\n\nWhat would you like to know?",
       timestamp: "Just now",
     },
   ])
@@ -715,7 +716,7 @@ export default function AICopilot() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Jishnu anything (e.g. skills, projects)..."
+                placeholder="Ask about my CV, CGPA, projects, internships..."
                 className="w-full bg-transparent text-white font-mono text-xs py-2 pr-3 focus:outline-none placeholder-gray-500"
               />
             </div>

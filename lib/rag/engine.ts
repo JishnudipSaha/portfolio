@@ -22,23 +22,72 @@ const stopWords = new Set([
   "it", "we", "they", "his", "her", "their", "my", "your"
 ])
 
-// Semantic synonym map for developer portfolio terminology
+// Semantic synonym map for updated developer portfolio & resume terminology
 const synonymMap: Record<string, string[]> = {
-  ml: ["machine learning", "deep learning", "model", "predictive", "neural"],
-  ai: ["artificial intelligence", "deep learning", "langchain", "llm", "gemini"],
-  python: ["scikit-learn", "pandas", "numpy", "opencv", "tensorflow"],
-  next: ["nextjs", "react", "app router", "frontend"],
-  frontend: ["react", "nextjs", "typescript", "tailwind", "ui"],
-  backend: ["nodejs", "express", "flask", "java", "api"],
+  ml: ["machine learning", "deep learning", "model", "predictive", "neural", "oct", "retina"],
+  ai: ["artificial intelligence", "deep learning", "retinaface", "arcface", "insightface", "opencv"],
+  python: ["scikit-learn", "pandas", "numpy", "fastapi", "dvc"],
+  fastapi: ["api", "backend", "postgresql", "rest", "modular"],
+  docker: ["containers", "containerization", "deployment", "tools", "platform"],
+  dvc: ["data version control", "pipeline", "versioning", "reproducibility", "titanic"],
   hire: ["availability", "internship", "job", "work", "opportunities", "contact"],
-  internship: ["codsoft", "experience", "work", "intern", "availability"],
-  college: ["education", "nit", "narula", "btech", "degree", "university"],
-  projects: ["portfolio", "repositories", "code", "built", "system"],
-  resume: ["cv", "pdf", "download", "curriculum vitae"],
-  contact: ["email", "reach", "message", "linkedin", "github"],
-  java: ["hackerrank", "gold medal", "oop", "library management"],
-  certifications: ["google", "google cloud", "deloitte", "credentials", "badges"],
+  internship: ["experience", "work", "intern", "ediglobe", "shadowfox", "google aicte"],
+  college: ["education", "nit", "narula", "btech", "degree", "academics", "cgpa", "8.08"],
+  school: ["sudhir memorial", "st xaviers", "secondary", "higher secondary", "10th", "12th", "marks", "percentage"],
+  cgpa: ["grade", "marks", "score", "8.08", "academics", "percentage", "sem", "semester"],
+  attendance: ["smart attendance", "face recognition", "retinaface", "arcface", "insightface", "opencv", "docker"],
+  projects: ["portfolio", "repositories", "code", "built", "eye disease", "titanic", "smart attendance"],
+  resume: ["cv", "pdf", "download", "curriculum vitae", "profile"],
+  contact: ["email", "reach", "message", "linkedin", "github", "belgharia", "kolkata"],
+  java: ["nptel", "92/100", "oop", "programming"],
+  certifications: ["nptel", "google", "eduskills", "aicte", "ediglobe", "shadowfox", "credentials"],
 }
+
+// In-scope portfolio keywords to verify whether a query is related to Jishnu's CV / academics / projects
+const inScopeVocabulary = new Set([
+  "jishnu", "jishnudip", "saha", "you", "your", "yourself", "who", "whom",
+  "resume", "cv", "profile", "bio", "background", "about",
+  "education", "academics", "college", "school", "university", "degree", "btech", "cse", "narula", "nit",
+  "cgpa", "marks", "grade", "percentage", "score", "10th", "12th", "semester", "secondary", "sudhir", "xavier",
+  "skill", "skills", "tech", "stack", "language", "languages", "python", "java", "c", "c++", "cpp", "sql", "mysql", "postgresql",
+  "fastapi", "docker", "dvc", "git", "github", "scikit", "pandas", "numpy", "opencv", "retinaface", "arcface", "insightface",
+  "project", "projects", "eye disease", "oct", "retina", "titanic", "attendance", "spam", "ham",
+  "internship", "intern", "experience", "ediglobe", "shadowfox", "aicte", "eduskills", "nptel", "certificate", "certificates", "certification",
+  "contact", "email", "hire", "work", "job", "available", "opportunity", "reach", "linkedin", "location", "kolkata", "belgharia",
+  "hi", "hello", "hey", "greetings", "morning", "afternoon", "evening", "thanks", "thank you", "bye"
+])
+
+/**
+ * Check if a query is strictly in-scope for Jishnudip's CV, resume, academics, or portfolio.
+ */
+function isOutOfScope(query: string, retrieved: RAGRetrievalResult[]): boolean {
+  const cleanTokens = tokenize(query)
+  if (cleanTokens.length === 0) return false // Empty or pure greetings handled elsewhere
+
+  // Check if any clean token matches the portfolio vocabulary
+  const hasInScopeToken = cleanTokens.some((t) => inScopeVocabulary.has(t))
+  if (hasInScopeToken) return false
+
+  // Check if expanded tokens match any in-scope vocabulary
+  const expanded = expandQuery(cleanTokens)
+  const hasExpandedMatch = expanded.some((t) => inScopeVocabulary.has(t))
+  if (hasExpandedMatch) return false
+
+  // If top retrieved score is very high (above 6), it's probably relevant
+  if (retrieved.length > 0 && retrieved[0].score >= 6) return false
+
+  // Otherwise, it is out-of-scope!
+  return true
+}
+
+const OUT_OF_SCOPE_REFUSAL = 
+  `Hey! As Jishnudip's AI portfolio assistant, I am **exclusively trained to answer questions about my CV, resume, academic records, data science projects, technical skills, and internship availability**.\n\n` +
+  `I do not answer general trivia, homework questions, or unrelated off-topic queries. Feel free to ask me anything about:\n` +
+  `* **🎓 Academics:** Narula Institute of Technology (CGPA: 8.08), 12th (89.02%), or 10th (90.25%)\n` +
+  `* **⚡ Technical Skills:** Python, Java, C/C++, FastAPI, Scikit-learn, SQL/PostgreSQL, Docker, DVC\n` +
+  `* **🚀 Projects:** Eye Disease Detection (OCT), Titanic Survival (DVC), or Smart Attendance (FastAPI/RetinaFace)\n` +
+  `* **💼 Experience:** EdiGlobe, ShadowFox, and Google AI-ML Virtual Internship (AICTE)\n` +
+  `* **📄 Resume & Contact:** Downloading my CV or getting in touch for internships!`
 
 /**
  * Tokenize text into lowercased clean words
@@ -144,17 +193,21 @@ export function retrieveContext(query: string, topK = 4): RAGRetrievalResult[] {
 
 /**
  * Local Context Synthesis Engine:
- * Generates an authentic, first-person response as Jishnudip Saha when no LLM API key is configured.
+ * Generates an authentic, first-person response as Jishnudip Saha based strictly on CV records.
  */
 function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): string {
+  // Check strict out-of-scope guardrail
+  if (isOutOfScope(query, retrieved)) {
+    return OUT_OF_SCOPE_REFUSAL
+  }
+
   if (retrieved.length === 0) {
-    return `Hey! I don't have that specific topic documented in my portfolio records yet for "${query}". You can ask me about my **programming skills** (Python, TypeScript, Java, TensorFlow), my **machine learning projects** (like my Movie Recommender or Titanic Classifier), my **education** at Narula Institute of Technology, or how we can connect for **internships**!`
+    return OUT_OF_SCOPE_REFUSAL
   }
 
   const queryLower = query.toLowerCase()
-  const top = retrieved[0].chunk
 
-  // Specialized synthesis based on query intent
+  // 1. Self-Introduction / Bio
   if (
     queryLower.includes("about yourself") ||
     queryLower.includes("about you") ||
@@ -163,76 +216,121 @@ function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): 
     queryLower.includes("introduction") ||
     queryLower.includes("who is jishnu") ||
     queryLower.includes("tell me about yourself") ||
+    queryLower.includes("summary") ||
     queryLower.includes("who jishnu")
   ) {
-    return `Hey! 👋 I'm **Jishnudip Saha**, a 3rd-year Data Science undergraduate at **Narula Institute of Technology** (graduating in 2027) based in Kolkata, India.\n\n` +
-      `I love turning data and ideas into intelligent, production-ready software. Here is a quick snapshot of who I am and what I do:\n\n` +
-      `* **🎓 Academic Focus:** B.Tech in Computer Science & Engineering (Data Science) specializing in predictive neural models, algorithms, and distributed systems.\n` +
-      `* **⚡ Core Stack:** Python (TensorFlow, Scikit-learn, Pandas, NumPy), TypeScript, Next.js 16, React 19, Java (HackerRank 5-Star Gold Medal), and SQL.\n` +
-      `* **🚀 Highlighted Projects:** Content-based [Movie Recommender](https://jishnudip-mrs-project-tmdb.streamlit.app/), [Titanic Survival Classifier](https://codsoft-project-titanic.streamlit.app/), and Retinal Eye Disease CNN.\n` +
-      `* **💼 Current Status:** I am **actively seeking Software Engineering and Data Science internships** (open to remote & on-site).\n\n` +
-      `👉 Feel free to check out my [Projects Showcase](/projects), download my [Resume](/Jishnudip%20Saha%20CV.pdf), or email me directly at [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com)!`
+    return `Hey! 👋 I'm **Jishnudip Saha**, a passionate Data Science student at **Narula Institute of Technology** (Kolkata, class of 2027) with a **CGPA of 8.08 (upto 5th sem)**.\n\n` +
+      `I have a strong foundation in Python, machine learning, and data analysis, with experience building end-to-end projects from data preprocessing to model evaluation. Here is a quick snapshot of my background:\n\n` +
+      `* **🎓 Academics:** B.Tech in CSE (Narula Institute of Technology, CGPA: 8.08) • 12th from Sudhir Memorial (89.02%) • 10th from St. Xavier's (90.25%).\n` +
+      `* **⚡ Core Skills:** Python, Java (NPTEL 92/100), C/C++, SQL, MySQL, PostgreSQL, FastAPI, Scikit-learn, Pandas, NumPy, Docker, and DVC.\n` +
+      `* **🚀 Key Projects:** Eye Disease Detection (OCT Deep Learning), Titanic Disaster Prediction with DVC, and AI-Powered Smart Attendance System (FastAPI/RetinaFace/Docker).\n` +
+      `* **💼 Experience:** Data Science Intern at **EdiGlobe** (Titanic 97% accuracy, Spam-Ham) & **ShadowFox** (EDA, Scikit-learn, ROC-AUC).\n` +
+      `* **🏆 Credentials:** Google AI-ML Virtual Internship (EduSkills/AICTE, 100% marks), NPTEL Java (92/100).\n\n` +
+      `👉 Feel free to ask about any specific project, download my [Resume](/Jishnudip%20Saha%20CV.pdf), or email me directly at [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com)!`
   }
 
-  if (queryLower.includes("skill") || queryLower.includes("tech") || queryLower.includes("stack") || queryLower.includes("language")) {
-    const skillChunks = retrieved.filter((r) => r.chunk.category === "skills")
-    const chunks = skillChunks.length > 0 ? skillChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
-    
-    return `Hey! Here is a breakdown of what I build with every day:\n\n` +
-      chunks.map((c) => `### ⚡ ${c.title}\n${c.content}`).join("\n\n") +
-      `\n\n👉 You can interactively filter all 18+ technologies in my [Tech Stack Matrix](/about#skills) on the About page.`
-  }
-
-  if (queryLower.includes("project") || queryLower.includes("built") || queryLower.includes("work") || queryLower.includes("app")) {
-    const projChunks = retrieved.filter((r) => r.chunk.category === "projects")
-    const chunks = projChunks.length > 0 ? projChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
-
-    return `I'd love to share my engineering projects with you! Here are some of the key builds I've architected:\n\n` +
-      chunks.map((c) => `### 🚀 [${c.title}](${c.link || "/projects"})\n${c.content}`).join("\n\n") +
-      `\n\n👉 You can explore all my repositories and test out live deployed demos in my [Projects Showcase](/projects).`
-  }
-
-  if (queryLower.includes("contact") || queryLower.includes("email") || queryLower.includes("hire") || queryLower.includes("reach") || queryLower.includes("message") || queryLower.includes("available")) {
-    return `### 📬 Let's Connect!\n\n` +
-      `I am **actively seeking software engineering & data science internships** and high-impact technical collaborations. I'd love to discuss opportunities with your team!\n\n` +
-      `* **Email:** [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com) *(I respond within 24 hours)*\n` +
-      `* **GitHub:** [github.com/JishnudipSaha](https://github.com/JishnudipSaha)\n` +
-      `* **LinkedIn:** [linkedin.com/in/jishnudipsaha](https://www.linkedin.com/in/jishnudipsaha/)\n` +
-      `* **Location:** Kolkata, West Bengal, India (UTC+5:30)\n\n` +
-      `👉 You can also dispatch a direct message to me right from my [Contact Terminal](/contact).`
-  }
-
-  if (queryLower.includes("education") || queryLower.includes("college") || queryLower.includes("university") || queryLower.includes("degree")) {
+  // 2. Education & Academics (CGPA, marks, schools)
+  if (
+    queryLower.includes("education") ||
+    queryLower.includes("academic") ||
+    queryLower.includes("college") ||
+    queryLower.includes("university") ||
+    queryLower.includes("degree") ||
+    queryLower.includes("btech") ||
+    queryLower.includes("cgpa") ||
+    queryLower.includes("marks") ||
+    queryLower.includes("percentage") ||
+    queryLower.includes("school") ||
+    queryLower.includes("10th") ||
+    queryLower.includes("12th") ||
+    queryLower.includes("sudhir") ||
+    queryLower.includes("xavier") ||
+    queryLower.includes("nit") ||
+    queryLower.includes("narula")
+  ) {
     return `### 🎓 My Academic Background\n\n` +
-      `I'm currently in my B.Tech program in Computer Science & Engineering (specializing in Data Science) at **Narula Institute of Technology**, graduating in 2027.\n\n` +
-      `My coursework emphasizes Machine Learning, Deep Learning, Statistical Analysis, Algorithms, and Distributed Systems.\n\n` +
-      `👉 Learn more about my journey on my [About Page](/about).`
+      `Here is my complete verified academic track record from my resume:\n\n` +
+      `1. **Bachelor of Technology (B.Tech) in Computer Science and Engineering**\n` +
+      `   * **Institution:** Narula Institute of Technology, Kolkata (08/2023 – Present)\n` +
+      `   * **Score:** **CGPA: 8.08** (upto 5th semester)\n\n` +
+      `2. **Higher Secondary (Class 12)**\n` +
+      `   * **Institution:** Sudhir Memorial Institute, Kolkata (04/2022 – 04/2023)\n` +
+      `   * **Score:** **89.02%**\n\n` +
+      `3. **Secondary Education (Class 10)**\n` +
+      `   * **Institution:** St. Xavier's Institute (04/2020 – 04/2021)\n` +
+      `   * **Score:** **90.25%**`
   }
 
-  if (queryLower.includes("achievement") || queryLower.includes("certification") || queryLower.includes("cert") || queryLower.includes("medal") || queryLower.includes("award")) {
-    const certChunks = retrieved.filter((r) => r.chunk.category === "achievements")
-    const chunks = certChunks.length > 0 ? certChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
-
-    return `### 🏆 Honors & Verified Credentials\n\n` +
-      `Here are some recognitions I've earned:\n\n` +
-      chunks.map((c) => `* **${c.title}**\n  ${c.content}`).join("\n\n") +
-      `\n\n👉 You can verify my credential IDs directly on my [Achievements Page](/achievements).`
+  // 3. Technical Skills
+  if (queryLower.includes("skill") || queryLower.includes("tech") || queryLower.includes("stack") || queryLower.includes("language") || queryLower.includes("database") || queryLower.includes("framework") || queryLower.includes("tool")) {
+    return `### ⚡ Technical Skills & Proficiencies\n\n` +
+      `Straight from my updated resume, here are the technologies I actively build with:\n\n` +
+      `* **Programming Languages:** Java, Python, C/C++\n` +
+      `* **Database Management:** SQL, MySQL, PostgreSQL\n` +
+      `* **Frameworks & Libraries:** FastAPI, Scikit-learn, Pandas, NumPy, OpenCV, RetinaFace, ArcFace\n` +
+      `* **Tools & Platforms:** Git, GitHub, Docker, DVC (Data Version Control)`
   }
 
+  // 4. Projects
+  if (queryLower.includes("project") || queryLower.includes("built") || queryLower.includes("eye disease") || queryLower.includes("oct") || queryLower.includes("titanic") || queryLower.includes("attendance") || queryLower.includes("dvc")) {
+    return `### 🚀 Key Projects from My Resume\n\n` +
+      `1. **Eye Disease Detection using Deep Learning (OCT Images)**\n` +
+      `   * Developed a Deep Learning model to detect eye diseases using Optical Coherence Tomography (OCT) retinal images.\n\n` +
+      `2. **Titanic Disaster Prediction Model using DVC**\n` +
+      `   * Developed an ML model to predict passenger survival on the Titanic dataset.\n` +
+      `   * Implemented a data versioning pipeline using **DVC** to track datasets, model versions, and experiments.\n` +
+      `   * Built a structured, reproducible ML workflow with Python and Scikit-learn.\n\n` +
+      `3. **AI-Powered Smart Attendance System**\n` +
+      `   * **Tech Stack:** FastAPI, PostgreSQL, RetinaFace, InsightFace, OpenCV, Docker.\n` +
+      `   * Multi-face classroom recognition with automated attendance logging.\n` +
+      `   * Modular FastAPI backend with facial embedding generation and PostgreSQL integration using ArcFace cosine similarity and confidence thresholding.`
+  }
+
+  // 5. Experience & Internships
+  if (queryLower.includes("experience") || queryLower.includes("internship") || queryLower.includes("ediglobe") || queryLower.includes("shadowfox")) {
+    return `### 💼 Work Experience & Internships\n\n` +
+      `1. **EdiGlobe — Data Science Intern (09/2025 – 10/2025 | Kolkata)**\n` +
+      `   * Worked on Titanic survival prediction, achieving **97% accuracy** through data preprocessing and model evaluation.\n` +
+      `   * Built and trained a Spam-Ham prediction model for text classification.\n\n` +
+      `2. **ShadowFox — Data Science Intern (08/2025 – 10/2025 | Kolkata)**\n` +
+      `   * Performed data preprocessing, feature engineering, and model training using Python and Scikit-learn for predictive analysis.\n` +
+      `   * Conducted Exploratory Data Analysis (EDA) to extract insights from real-world datasets.\n` +
+      `   * Optimized model performance evaluated with accuracy and ROC-AUC metrics.`
+  }
+
+  // 6. Certificates
+  if (queryLower.includes("certificate") || queryLower.includes("certification") || queryLower.includes("nptel") || queryLower.includes("aicte") || queryLower.includes("eduskills")) {
+    return `### 🏆 Certificates & Verified Credentials\n\n` +
+      `* **Programming in Java (NPTEL):** Scored **92/100**.\n` +
+      `* **Google AI-ML Virtual Internship:** Conducted by EduSkills in collaboration with AICTE. Secured **100% marks**.\n` +
+      `* **Data Science Internship Program Certifications:** Officially awarded by **EdiGlobe** and **ShadowFox**.`
+  }
+
+  // 7. Resume Download
   if (queryLower.includes("resume") || queryLower.includes("cv")) {
-    return `### 📄 My Resume & CV\n\n` +
-      `You can download a clean PDF copy of my latest resume right here:\n\n` +
+    return `### 📄 Resume & CV Download\n\n` +
+      `You can download a clean PDF copy of my updated resume here:\n\n` +
       `📥 **[Download Jishnudip Saha CV (PDF)](/Jishnudip%20Saha%20CV.pdf)**\n\n` +
-      `It includes comprehensive details on my data science projects, technical proficiencies, education, and credentials.`
+      `It includes my full academic details (NIT CGPA: 8.08, 12th: 89.02%, 10th: 90.25%), projects (DVC Titanic, Smart Attendance, OCT Eye Disease), skills, and internships.`
+  }
+
+  // 8. Contact & Availability
+  if (queryLower.includes("contact") || queryLower.includes("email") || queryLower.includes("hire") || queryLower.includes("reach") || queryLower.includes("available") || queryLower.includes("location") || queryLower.includes("linkedin") || queryLower.includes("github")) {
+    return `### 📬 Contact & Availability\n\n` +
+      `I am **actively seeking Software Engineering and Data Science internships** and technical collaborations!\n\n` +
+      `* **Email:** [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com)\n` +
+      `* **LinkedIn:** [linkedin.com/in/jishnudipsaha](https://www.linkedin.com/in/jishnudipsaha/)\n` +
+      `* **GitHub:** [github.com/JishnudipSaha](https://github.com/JishnudipSaha)\n` +
+      `* **Location:** Kolkata (1/41/1, Jatindas Nagar, Belgharia, Kolkata)`
   }
 
   // General synthesized answer from retrieved chunks
   const primaryChunk = retrieved[0].chunk
   const secondaryChunk = retrieved[1]?.chunk
 
-  let answer = `Regarding **${primaryChunk.title}**, here is what I can share from my experience:\n\n${primaryChunk.content}`
+  let answer = `Regarding **${primaryChunk.title}** from my resume:\n\n${primaryChunk.content}`
   if (secondaryChunk && secondaryChunk.id !== primaryChunk.id) {
-    answer += `\n\nAlso, on **${secondaryChunk.title}**:\n${secondaryChunk.content}`
+    answer += `\n\nAlso, regarding **${secondaryChunk.title}**:\n${secondaryChunk.content}`
   }
 
   if (primaryChunk.link) {
@@ -243,7 +341,7 @@ function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): 
 }
 
 /**
- * Call LLM APIs (Google Gemini, Groq Llama, or OpenAI)
+ * Call LLM APIs (Groq Llama, Google Gemini, or OpenAI)
  */
 async function callLLMRAG(
   query: string,
@@ -251,21 +349,31 @@ async function callLLMRAG(
   apiKey: string
 ): Promise<{ answer: string; modelUsed: RAGResponse["modelUsed"] }> {
   const contextText = retrieved
-    .map((r, i) => `[Document ${i + 1}: ${r.chunk.title}]\n${r.chunk.content}\nLink: ${r.chunk.link || "N/A"}`)
+    .map((r, i) => `[Resume Section ${i + 1}: ${r.chunk.title}]\n${r.chunk.content}\nLink: ${r.chunk.link || "N/A"}`)
     .join("\n\n")
 
   const systemInstruction = 
     `You ARE Jishnudip Saha himself, chatting directly with visitors, tech recruiters, and engineering leaders who are browsing your personal portfolio website.\n\n` +
-    `CRITICAL PERSONA RULES:\n` +
-    `1. ALWAYS speak in the first person ("I", "my", "me"). NEVER speak as a third party or refer to "Jishnudip" as someone else.\n` +
-    `2. Persona: You are an ambitious, intelligent, warm, and humble 3rd-year Data Science undergraduate at Narula Institute of Technology (graduating in 2027) with strong hands-on expertise in Python, TensorFlow, Scikit-learn, TypeScript, Next.js, and Java.\n` +
-    `3. Conversational style: Friendly, articulate, energetic, and developer-savvy. Use natural conversational openings ("Hey there!", "Thanks for asking!", "That's one of my favorite projects!").\n` +
-    `4. Grounding: Answer strictly using facts from the provided portfolio context. Highlight your real metrics, datasets used (TMDB, OCT retinal scans, etc.), and technologies.\n` +
-    `5. Internships & Hiring: Always emphasize that you are actively seeking and excited for software engineering and data science internships!\n` +
-    `6. If something is unknown or not in context: Say warmly "I haven't posted that on my portfolio yet, but drop me an email at jishnudip.saha.2004@gmail.com and let's talk about it!"\n` +
-    `7. Format: Use clean GitHub markdown, bold highlights, concise bullet points, and markdown links to pages.`
+    `CRITICAL SCOPE RESTRICTION & STRICT BOUNDARY POLICY:\n` +
+    `1. ONLY ANSWER QUESTIONS ABOUT YOUR CV, RESUME, ACADEMICS, PROJECTS, AND INTERNSHIPS:\n` +
+    `   You are STRICTLY CONSTRAINED to answering queries directly related to Jishnudip Saha's:\n` +
+    `   - Academics: Narula Institute of Technology (B.Tech in CSE 08/2023–Present, CGPA: 8.08 upto 5th sem); Sudhir Memorial Institute (Higher Secondary 04/2022–04/2023, 89.02%); St. Xavier's Institute (Secondary 04/2020–04/2021, 90.25%).\n` +
+    `   - Technical Skills: Java, Python, C/C++, SQL, MySQL, PostgreSQL, FastAPI, Scikit-learn, Pandas, NumPy, OpenCV, Git, GitHub, Docker, DVC (Data Version Control).\n` +
+    `   - Projects: Eye Disease Detection using Deep Learning (OCT Images); Titanic Disaster Prediction model using DVC; AI-Powered Smart Attendance System (FastAPI, PostgreSQL, RetinaFace, InsightFace, OpenCV, Docker, ArcFace cosine similarity).\n` +
+    `   - Internships: EdiGlobe (09/2025–10/2025, Titanic survival 97% accuracy, Spam-Ham); ShadowFox (08/2025–10/2025, data preprocessing, feature engineering, Scikit-learn models, EDA, ROC-AUC); Google AI-ML Virtual Internship with EduSkills/AICTE (100% marks).\n` +
+    `   - Certificates: Programming in Java NPTEL (Scored 92/100); EduSkills/AICTE (100%); EdiGlobe & ShadowFox internship certificates.\n` +
+    `   - Contact & Availability: Actively seeking Software Engineering & Data Science internships. Email: jishnudip.saha.2004@gmail.com, LinkedIn, GitHub, Belgharia/Kolkata.\n\n` +
+    `2. STRICT REFUSAL FOR OUT-OF-SCOPE / OFF-TOPIC QUERIES:\n` +
+    `   If the visitor asks ANY question NOT related to Jishnudip Saha's CV, resume, academics, skills, projects, or career opportunities (such as general knowledge, trivia, history, weather, politics, recipes, sports, creative writing, homework/math assistance, general programming questions unrelated to your projects):\n` +
+    `   You MUST POLITELY REFUSE by saying:\n` +
+    `   "Hey! As Jishnudip's AI portfolio twin, I am exclusively dedicated to answering questions about my CV, resume, academic background, data science projects, technical skills, and internship availability. I cannot answer general trivia or off-topic queries, but please feel free to ask me anything about my machine learning projects, college, or tech stack!"\n\n` +
+    `3. PERSONA & FORMAT:\n` +
+    `   - ALWAYS speak in the first person ("I", "my", "me"). NEVER speak in third person.\n` +
+    `   - Maintain a friendly, sharp, humble, articulate tone as an ambitious 3rd-year CS Data Science student.\n` +
+    `   - Ground your answers strictly in the provided resume context. Do not invent any unmentioned degrees or companies.\n` +
+    `   - Format your answers cleanly with GitHub markdown (bullet points, bold text).`
 
-  const prompt = `Retrieved Portfolio Context:\n${contextText}\n\nVisitor's Message:\n${query}\n\nReply as Jishnudip:`
+  const prompt = `Verified Resume Context:\n${contextText}\n\nVisitor's Message:\n${query}\n\nReply as Jishnudip:`
 
   const cleanKey = apiKey.trim()
 
@@ -287,7 +395,7 @@ async function callLLMRAG(
               { role: "system", content: systemInstruction },
               { role: "user", content: prompt },
             ],
-            temperature: 0.35,
+            temperature: 0.25, // Lower temperature for strict factual grounding
             max_tokens: 650,
           }),
         })
@@ -321,7 +429,7 @@ async function callLLMRAG(
           { role: "system", content: systemInstruction },
           { role: "user", content: prompt },
         ],
-        temperature: 0.35,
+        temperature: 0.25,
         max_tokens: 650,
       }),
     })
@@ -349,7 +457,7 @@ async function callLLMRAG(
           contents: [{ parts: [{ text: prompt }] }],
           systemInstruction: { parts: [{ text: systemInstruction }] },
           generationConfig: {
-            temperature: 0.35,
+            temperature: 0.25,
             maxOutputTokens: 650,
           },
         }),
