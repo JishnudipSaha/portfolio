@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import Navigation from "@/components/navigation"
 import CustomCursor from "@/components/custom-cursor"
 import ScrollProgress from "@/components/scroll-progress"
+import AICopilot from "@/components/ai-copilot"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navigation />
         <CustomCursor />
         {children}
+        <AICopilot />
       </body>
     </html>
   )

@@ -54,7 +54,7 @@ export default function TerminalWindow({ className = "" }: { className?: string 
   const inputRef = useRef<HTMLInputElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const quickCommands = ["help", "skills", "projects", "about", "contact", "clear"]
+  const quickCommands = ["help", "skills", "projects", "ask ML projects", "contact", "clear"]
 
   // Cursor blink interval
   useEffect(() => {
@@ -156,6 +156,56 @@ export default function TerminalWindow({ className = "" }: { className?: string 
       return
     }
 
+    // RAG AI Query via Terminal
+    if (cleanCmd.startsWith("ask ") || cleanCmd.startsWith("ai ") || cleanCmd.startsWith("rag ")) {
+      const query = cmd.trim().replace(/^(ask|ai|rag)\s+/i, "")
+      const loadingEntry: CommandHistory = {
+        command: cmd,
+        output: <span className="text-cyan-400 animate-pulse">⚡ Querying RAG knowledge base &amp; generating answer...</span>,
+        timestamp: time,
+      }
+      setHistory((prev) => [...prev, loadingEntry])
+      setInputVal("")
+
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          playSuccessChime()
+          setHistory((prev) => [
+            ...prev.slice(0, -1),
+            {
+              command: cmd,
+              output: (
+                <div className="space-y-1.5">
+                  <div className="text-cyan-300 leading-relaxed whitespace-pre-line">{data.answer}</div>
+                  {data.sources && data.sources.length > 0 && (
+                    <div className="text-[10px] text-gray-500 pt-1">
+                      📚 Sources retrieved: {data.sources.map((s: { title: string }) => s.title).join(", ")}
+                    </div>
+                  )}
+                </div>
+              ),
+              timestamp: time,
+            },
+          ])
+        })
+        .catch(() => {
+          setHistory((prev) => [
+            ...prev.slice(0, -1),
+            {
+              command: cmd,
+              output: "Error querying RAG knowledge base. Please try again.",
+              timestamp: time,
+            },
+          ])
+        })
+      return
+    }
+
     let output: React.ReactNode = ""
 
     switch (cleanCmd) {
@@ -163,6 +213,7 @@ export default function TerminalWindow({ className = "" }: { className?: string 
         output = (
           <div className="space-y-1 text-gray-300">
             <p className="text-purple-300">Available commands:</p>
+            <p><span className="text-cyan-400">ask &lt;prompt&gt;</span> - Ask anything to the RAG AI Knowledge Copilot (or use &apos;ai &lt;prompt&gt;&apos;)</p>
             <p><span className="text-cyan-400">skills</span> - List core languages and frameworks</p>
             <p><span className="text-cyan-400">projects</span> - View top highlighted software &amp; ML builds</p>
             <p><span className="text-cyan-400">about</span> - Read background and college info</p>

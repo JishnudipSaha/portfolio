@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { 
   Search, Terminal, Home, User, Briefcase, Award, Mail, 
-  Github, Linkedin, Download, Copy, Check, X, Sparkles
+  Github, Linkedin, Download, Copy, Check, X, Sparkles, Bot
 } from "lucide-react"
 import { playKeyClick, playSuccessChime } from "./sound-effects"
 
@@ -68,6 +68,17 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
       category: "Navigation",
       icon: Mail,
       action: () => { router.push("/contact"); onClose() },
+    },
+    {
+      id: "action-ai",
+      title: "Ask AI Jishnu (RAG Copilot)",
+      subtitle: "Ask questions about projects, stack, and availability (⌘J)",
+      category: "Actions",
+      icon: Bot,
+      action: () => {
+        onClose()
+        window.dispatchEvent(new CustomEvent("open-ai-copilot"))
+      },
     },
     {
       id: "action-cv",

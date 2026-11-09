@@ -31,6 +31,15 @@ A high-performance, developer-centric portfolio designed with an **interactive t
 - **Multi-Layer Blur**: `backdrop-blur-xl` and `backdrop-blur-2xl` glass panels layered over cyber-grid background grids and neon violet/cyan glow orbs.
 - **Cyberpunk Color Palette**: High-contrast dark theme powered by Cyber Purple (`#a855f7`), Electric Cyan (`#06b6d4`), and Status Emerald (`#10b981`).
 
+### 🤖 Embedded RAG AI Assistant ("Ask AI Jishnu")
+- **Retrieval-Augmented Generation (RAG)**: An embedded AI assistant trained on Jishnudip's complete professional knowledge base (bio, education, skills, repositories, certifications, contact channels, and recruiter FAQs).
+- **Dual-Mode AI Engine**:
+  - **Google Gemini API**: Automatically uses Gemini 1.5/2.0 Flash for natural language answers with contextual grounding when `GEMINI_API_KEY` is provided.
+  - **Local Semantic RAG Synthesizer**: Seamless fallback with TF-IDF, semantic synonym expansion, and contextual synthesis when running with zero API keys.
+- **Inspectable Source Citations**: Every response lists the exact retrieved knowledge chunks with relevance scores and direct portfolio links.
+- **Terminal CLI Integration**: Ask questions directly inside the home terminal cockpit via `$ ask <query>` or `$ ai <query>`.
+- **Global Shortcut**: Press `⌘J` or `Ctrl+J` from anywhere on the site to toggle the assistant.
+
 ### ⌨️ Developer Command Palette (`⌘K` / `Ctrl+K`)
 - Instant keyboard-first navigation modal.
 - Search and jump across routes (`Home`, `About`, `Projects`, `Achievements`, `Contact`).
@@ -63,6 +72,9 @@ portfolio/
 │   │   └── page.tsx
 │   ├── achievements/       # Contests, medals, and verified Google/Deloitte certs
 │   │   └── page.tsx
+│   ├── api/
+│   │   └── chat/           # RAG retrieval & generation API endpoint
+│   │       └── route.ts
 │   ├── contact/            # Encrypted dispatch terminal form & direct links
 │   │   └── page.tsx
 │   ├── projects/           # Categorized repository showcase with search
@@ -73,6 +85,7 @@ portfolio/
 │   ├── not-found.tsx       # Custom 404 Null Pointer Exception page
 │   └── page.tsx            # Main landing page & Developer Cockpit
 ├── components/
+│   ├── ai-copilot.tsx      # Floating RAG AI chat assistant widget (⌘J)
 │   ├── animated-counter.tsx # Viewport-triggered animated number counters
 │   ├── code-rain.tsx       # Matrix digital rain canvas
 │   ├── command-palette.tsx # Ctrl+K global keyboard navigation modal
@@ -88,7 +101,11 @@ portfolio/
 │   ├── section-wrapper.tsx # Smooth viewport-triggered scroll reveals
 │   ├── sound-effects.ts    # Web Audio API tactile mechanical click synthesizer
 │   ├── tech-stack-matrix.tsx # Filterable skills & proficiency matrix
-│   └── terminal-window.tsx # Multi-tab interactive terminal & code lab
+│   └── terminal-window.tsx # Multi-tab interactive terminal with 'ask' command
+├── lib/
+│   └── rag/
+│       ├── engine.ts       # Vector similarity scoring, retrieval & generation
+│       └── knowledge.ts    # Portfolio vector knowledge base chunks
 ├── public/                 # Static assets, project imagery, and CV PDF
 ├── tailwind.config.ts      # Custom theme extensions, neon colors, & glass shadows
 └── tsconfig.json           # TypeScript compiler configuration
@@ -130,12 +147,20 @@ portfolio/
    npm install
    ```
 
-3. Run the development server:
+3. (Optional) Configure Gemini API for the RAG Assistant:
+   ```bash
+   cp .env.example .env.local
+   # Add your key inside .env.local:
+   # GEMINI_API_KEY=your_key_here
+   ```
+   *Note: If no API key is provided, the system automatically uses the high-precision built-in Semantic Vector RAG Synthesizer.*
+
+4. Run the development server:
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Production Build
 To create an optimized production build:
