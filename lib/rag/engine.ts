@@ -252,31 +252,40 @@ async function callLLMRAG(
 
   // Groq API (Keys start with gsk_)
   if (cleanKey.startsWith("gsk_")) {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${cleanKey}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.35,
-        max_tokens: 650,
-      }),
-    })
+    const groqModels = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"]
 
-    if (!res.ok) {
-      throw new Error(`Groq API error: ${res.status} ${res.statusText}`)
+    for (const model of groqModels) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemInstruction },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.35,
+            max_tokens: 650,
+          }),
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          const content = data.choices?.[0]?.message?.content
+          if (content) {
+            return { answer: content, modelUsed: "groq-llama-3.3" }
+          }
+        }
+      } catch {
+        // Fallback to next model
+      }
     }
 
-    const data = await res.json()
-    const content = data.choices?.[0]?.message?.content
-    if (!content) throw new Error("No answer from Groq API")
-    return { answer: content, modelUsed: "groq-llama-3.3" }
+    throw new Error("All Groq models failed")
   }
 
   // OpenAI API (Keys start with sk-)
