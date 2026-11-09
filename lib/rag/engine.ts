@@ -10,7 +10,7 @@ export interface RAGResponse {
   answer: string
   sources: KnowledgeChunk[]
   query: string
-  modelUsed: "gemini-api" | "local-rag-synthesizer"
+  modelUsed: "gemini-2.0-flash" | "gemini-1.5-flash" | "groq-llama-3.3" | "openai-gpt-4o" | "local-rag-synthesizer"
 }
 
 // Common stop words to ignore in query tokenization
@@ -224,9 +224,13 @@ function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): 
 }
 
 /**
- * Call Google Gemini API if key is present in environment
+ * Call LLM APIs (Google Gemini, Groq Llama, or OpenAI)
  */
-async function callGeminiRAG(query: string, retrieved: RAGRetrievalResult[], apiKey: string): Promise<string> {
+async function callLLMRAG(
+  query: string,
+  retrieved: RAGRetrievalResult[],
+  apiKey: string
+): Promise<{ answer: string; modelUsed: RAGResponse["modelUsed"] }> {
   const contextText = retrieved
     .map((r, i) => `[Document ${i + 1}: ${r.chunk.title}]\n${r.chunk.content}\nLink: ${r.chunk.link || "N/A"}`)
     .join("\n\n")
@@ -244,52 +248,125 @@ async function callGeminiRAG(query: string, retrieved: RAGRetrievalResult[], api
 
   const prompt = `Retrieved Portfolio Context:\n${contextText}\n\nVisitor's Message:\n${query}\n\nReply as Jishnudip:`
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+  const cleanKey = apiKey.trim()
 
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      generationConfig: {
-        temperature: 0.35,
-        maxOutputTokens: 600,
+  // Groq API (Keys start with gsk_)
+  if (cleanKey.startsWith("gsk_")) {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cleanKey}`,
       },
-    }),
-  })
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.35,
+        max_tokens: 650,
+      }),
+    })
 
-  if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status} ${response.statusText}`)
+    if (!res.ok) {
+      throw new Error(`Groq API error: ${res.status} ${res.statusText}`)
+    }
+
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content
+    if (!content) throw new Error("No answer from Groq API")
+    return { answer: content, modelUsed: "groq-llama-3.3" }
   }
 
-  const data = await response.json()
-  const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text
-  if (!candidate) {
-    throw new Error("No text response returned by Gemini API")
+  // OpenAI API (Keys start with sk-)
+  if (cleanKey.startsWith("sk-")) {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cleanKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.35,
+        max_tokens: 650,
+      }),
+    })
+
+    if (!res.ok) {
+      throw new Error(`OpenAI API error: ${res.status} ${res.statusText}`)
+    }
+
+    const data = await res.json()
+    const content = data.choices?.[0]?.message?.content
+    if (!content) throw new Error("No answer from OpenAI API")
+    return { answer: content, modelUsed: "openai-gpt-4o" }
   }
 
-  return candidate
+  // Default: Google Gemini API (Try 2.0 Flash first, fallback to 1.5 Flash)
+  const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"]
+
+  for (const modelName of modelsToTry) {
+    try {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${cleanKey}`
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          generationConfig: {
+            temperature: 0.35,
+            maxOutputTokens: 650,
+          },
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text
+        if (candidate) {
+          return {
+            answer: candidate,
+            modelUsed: modelName === "gemini-2.0-flash" ? "gemini-2.0-flash" : "gemini-1.5-flash",
+          }
+        }
+      }
+    } catch {
+      // Try next model fallback
+    }
+  }
+
+  throw new Error("Gemini API calls failed for all candidate models")
 }
 
 /**
  * Main RAG Query Processor
  */
-export async function processRAGQuery(query: string): Promise<RAGResponse> {
+export async function processRAGQuery(query: string, customApiKey?: string): Promise<RAGResponse> {
   const retrieved = retrieveContext(query, 4)
-  const apiKey = process.env.GEMINI_API_KEY
+  const apiKey =
+    customApiKey ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GROQ_API_KEY ||
+    process.env.OPENAI_API_KEY
 
   if (apiKey && apiKey.trim().length > 10) {
     try {
-      const llmAnswer = await callGeminiRAG(query, retrieved, apiKey)
+      const llmResult = await callLLMRAG(query, retrieved, apiKey)
       return {
-        answer: llmAnswer,
+        answer: llmResult.answer,
         sources: retrieved.map((r) => r.chunk),
         query,
-        modelUsed: "gemini-api",
+        modelUsed: llmResult.modelUsed,
       }
     } catch (err) {
-      console.warn("Gemini API call failed, falling back to local RAG synthesizer:", err)
+      console.warn("LLM API call failed, falling back to local RAG synthesizer:", err)
     }
   }
 

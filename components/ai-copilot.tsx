@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import { 
   X, Send, RotateCcw, ChevronDown, ChevronUp, 
   ExternalLink, Copy, Check, Sparkles,
-  CheckCircle2, FileText, Mail, ArrowUpRight, MessageCircle
+  CheckCircle2, FileText, Mail, ArrowUpRight,
+  Settings, Key, Bot
 } from "lucide-react"
 import { KnowledgeChunk } from "@/lib/rag/knowledge"
 import { playKeyClick, playSuccessChime } from "./sound-effects"
@@ -14,6 +15,7 @@ interface Message {
   role: "user" | "assistant"
   content: string
   sources?: KnowledgeChunk[]
+  modelUsed?: string
   timestamp: string
 }
 
@@ -34,18 +36,37 @@ export default function AICopilot() {
   const [loading, setLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({})
+  
+  // LLM Key configuration state
+  const [showSettings, setShowSettings] = useState(false)
+  const [customKey, setCustomKey] = useState("")
+  const [savedKey, setSavedKey] = useState<string | null>(null)
+  const [keySaveMessage, setKeySaveMessage] = useState(false)
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome-msg",
       role: "assistant",
-      content: "Hey there! 👋 I'm **Jishnudip Saha**. Welcome to my portfolio!\n\nI built this interactive AI twin using RAG so you can chat with me directly in real-time. Feel free to ask me anything about my **machine learning projects**, **technical skills**, my studies at **Narula Institute of Technology**, or **internship opportunities**!\n\nWhat would you like to know?",
+      content: "Hey there! 👋 I'm **Jishnudip Saha**. Welcome to my portfolio!\n\nI built this interactive AI twin so you can chat with me directly in real-time. Feel free to ask me anything about my **machine learning projects**, **technical skills**, my studies at **Narula Institute of Technology**, or **internship opportunities**!\n\nWhat would you like to explore together?",
       timestamp: "Just now",
     },
   ])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Load custom LLM key from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("jishnu_llm_key")
+      if (stored) {
+        setSavedKey(stored)
+        setCustomKey(stored)
+      }
+    } catch {
+      // Ignore localStorage read errors
+    }
+  }, [])
 
   // Focus input on open
   useEffect(() => {
@@ -89,6 +110,26 @@ export default function AICopilot() {
     }
   }, [isOpen])
 
+  const saveApiKey = () => {
+    playKeyClick()
+    try {
+      if (customKey.trim()) {
+        localStorage.setItem("jishnu_llm_key", customKey.trim())
+        setSavedKey(customKey.trim())
+      } else {
+        localStorage.removeItem("jishnu_llm_key")
+        setSavedKey(null)
+      }
+      setKeySaveMessage(true)
+      setTimeout(() => {
+        setKeySaveMessage(false)
+        setShowSettings(false)
+      }, 1200)
+    } catch {
+      // Ignore
+    }
+  }
+
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || input
     if (!textToSend.trim() || loading) return
@@ -109,10 +150,18 @@ export default function AICopilot() {
     setLoading(true)
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" }
+      if (savedKey) {
+        headers["x-llm-key"] = savedKey
+      }
+
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: textToSend.trim() }),
+        headers,
+        body: JSON.stringify({ 
+          message: textToSend.trim(),
+          apiKey: savedKey || undefined
+        }),
       })
 
       const data = await res.json()
@@ -123,6 +172,7 @@ export default function AICopilot() {
         role: "assistant",
         content: data.answer || "I received an empty response. Feel free to ask another question!",
         sources: data.sources || [],
+        modelUsed: data.modelUsed,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
 
@@ -235,82 +285,90 @@ export default function AICopilot() {
   return (
     <>
       {/* ========================================================= */}
-      {/* FLOATING RIGHT-SIDE LAUNCHER & TEASER */}
+      {/* FLOATING RIGHT-SIDE LAUNCHER & TEASER (ALWAYS ON RIGHT)    */}
       {/* ========================================================= */}
-      <div className="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 select-none pointer-events-none">
-        {/* Irresistible Teaser Speech Bubble (Visible when chat is closed) */}
-        {!isOpen && showTeaser && (
-          <div className="pointer-events-auto max-w-[290px] sm:max-w-[320px] glass-panel border border-purple-500/30 rounded-2xl p-3.5 shadow-2xl shadow-purple-950/40 relative animate-fade-in group hover:border-cyan-400/50 transition-all duration-300 backdrop-blur-xl">
-            {/* Dismiss button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowTeaser(false)
-              }}
-              aria-label="Dismiss greeting"
-              className="absolute top-2 right-2 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <X className="w-3 h-3" />
-            </button>
+      {!isOpen && (
+        <div 
+          style={{
+            position: "fixed",
+            bottom: "1.5rem",
+            right: "1.5rem",
+            zIndex: 9999,
+          }}
+          className="flex flex-col items-end gap-3 select-none pointer-events-auto"
+        >
+          {/* Irresistible Teaser Speech Bubble */}
+          {showTeaser && (
+            <div className="max-w-[290px] sm:max-w-[320px] rounded-2xl p-3.5 bg-[#0d0e18]/95 border border-purple-500/40 shadow-2xl shadow-purple-950/60 relative animate-fade-in group hover:border-cyan-400/60 transition-all duration-300 backdrop-blur-xl">
+              {/* Dismiss button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowTeaser(false)
+                }}
+                aria-label="Dismiss greeting"
+                className="absolute top-2 right-2 p-1 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
 
-            {/* Clickable Card Body */}
-            <div
-              onClick={() => {
-                playKeyClick()
-                setIsOpen(true)
-              }}
-              className="cursor-pointer flex items-start gap-3"
-            >
-              {/* Jishnu Avatar with live indicator */}
-              <div className="relative shrink-0 mt-0.5">
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400/70 shadow-glow-purple">
-                  <img
-                    src="/placeholder-user.jpg"
-                    alt="Jishnudip Saha"
-                    className="w-full h-full object-cover"
-                  />
+              {/* Clickable Card Body */}
+              <div
+                onClick={() => {
+                  playKeyClick()
+                  setIsOpen(true)
+                }}
+                className="cursor-pointer flex items-start gap-3"
+              >
+                {/* Jishnu Avatar with live indicator */}
+                <div className="relative shrink-0 mt-0.5">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400/80 shadow-glow-purple">
+                    <img
+                      src="/placeholder-user.jpg"
+                      alt="Jishnudip Saha"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#0d0e18] animate-pulse" />
                 </div>
-                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#050508] animate-pulse" />
+
+                {/* Teaser Content */}
+                <div className="flex-1 pr-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-xs font-bold font-mono text-white flex items-center gap-1">
+                      Jishnudip Saha
+                      <CheckCircle2 className="w-3 h-3 text-cyan-400" />
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Online
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 leading-snug">
+                    Hey! Ask me anything about my ML projects, technical stack, or internship availability 👋
+                  </p>
+                  <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-cyan-400 font-medium">
+                    <span className="flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      <span>Chat with me</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </span>
+                    <span className="text-gray-500">⌘J</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Teaser Content */}
-              <div className="flex-1 pr-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-xs font-bold font-mono text-white flex items-center gap-1">
-                    Jishnudip Saha
-                    <CheckCircle2 className="w-3 h-3 text-cyan-400" />
-                  </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    Online
-                  </span>
-                </div>
-                <p className="text-[11px] text-gray-300 leading-snug">
-                  Hey! Ask me anything about my ML projects, technical stack, or internship availability 👋
-                </p>
-                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-cyan-400 font-medium">
-                  <span className="flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    <span>Chat with me</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </span>
-                  <span className="text-gray-500">⌘J</span>
-                </div>
-              </div>
+              {/* Downward pointing speech bubble pip */}
+              <div className="absolute -bottom-1.5 right-7 w-3 h-3 bg-[#0d0e18] border-r border-b border-purple-500/40 rotate-45" />
             </div>
+          )}
 
-            {/* Downward pointing speech bubble pip */}
-            <div className="absolute -bottom-1.5 right-7 w-3 h-3 bg-[#0d0e15] border-r border-b border-purple-500/30 rotate-45" />
-          </div>
-        )}
-
-        {/* Floating Right-Side Launcher Pill */}
-        {!isOpen && (
+          {/* Floating Right-Side Launcher Pill */}
           <button
             onClick={() => {
               playKeyClick()
               setIsOpen(true)
             }}
             aria-label="Chat with Jishnu"
-            className="pointer-events-auto group relative flex items-center gap-3 px-3.5 py-2.5 rounded-full glass-panel border border-purple-500/40 hover:border-cyan-400/80 shadow-2xl hover:shadow-glow-cyan transition-all duration-300 hover:scale-105 cursor-pointer specular-border"
+            className="group relative flex items-center gap-3 px-3.5 py-2.5 rounded-full bg-[#0d0e18]/95 border border-purple-500/50 hover:border-cyan-400/90 shadow-2xl hover:shadow-glow-cyan transition-all duration-300 hover:scale-105 cursor-pointer backdrop-blur-xl"
           >
             {/* Jishnu Avatar */}
             <div className="relative shrink-0">
@@ -321,8 +379,8 @@ export default function AICopilot() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#050508] animate-ping" />
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#050508]" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0d0e18] animate-ping" />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0d0e18]" />
             </div>
 
             {/* Label */}
@@ -333,7 +391,7 @@ export default function AICopilot() {
               </span>
               <span className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>AI Twin • Ready to chat</span>
+                <span>AI Twin • {savedKey ? "Live LLM" : "RAG Grounded"}</span>
               </span>
             </div>
 
@@ -342,33 +400,60 @@ export default function AICopilot() {
               ⌘J
             </kbd>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ========================================================= */}
-      {/* EXPANDABLE CHAT WINDOW (RIGHT-SIDE ANCHORED) */}
+      {/* EXPANDABLE CHAT WINDOW (FIXED ON RIGHT SIDE WITH PADDING)  */}
       {/* ========================================================= */}
       {isOpen && (
-        <div className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-50 w-[94vw] sm:w-[430px] h-[600px] max-h-[86vh] flex flex-col rounded-2xl glass-panel border border-white/10 shadow-2xl overflow-hidden specular-border backdrop-blur-2xl animate-scale-in">
-          {/* Top Bar / Mac OS Style Controls */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-black/50 border-b border-white/10">
+        <div 
+          style={{
+            position: "fixed",
+            bottom: "1.25rem",
+            right: "1.25rem",
+            zIndex: 99999,
+            maxHeight: "calc(100dvh - 2.5rem)",
+          }}
+          className="w-[calc(100vw-2.5rem)] sm:w-[420px] max-w-[430px] h-[610px] flex flex-col rounded-2xl bg-[#080911]/95 border border-purple-500/30 shadow-2xl overflow-hidden backdrop-blur-2xl animate-scale-in"
+        >
+          {/* Top Bar / Mac OS Style Controls & Model Indicator */}
+          <div className="flex items-center justify-between px-3.5 py-2.5 bg-black/60 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors" />
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors" />
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors" />
               </div>
-              <span className="text-[11px] font-mono text-gray-400 border-l border-white/10 pl-2">
-                jishnu.ai // twin
+              <span className="text-[11px] font-mono text-gray-400 border-l border-white/10 pl-2 flex items-center gap-1">
+                <Bot className="w-3 h-3 text-cyan-400" />
+                <span>jishnu.ai</span>
               </span>
             </div>
 
             {/* Quick Action Icons */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
+              {/* LLM Key Settings toggle */}
+              <button
+                onClick={() => {
+                  playKeyClick()
+                  setShowSettings(!showSettings)
+                }}
+                title="Configure LLM API Key (Gemini / Groq)"
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-[10px] font-mono ${
+                  savedKey 
+                    ? "text-cyan-400 bg-cyan-500/10 border border-cyan-500/30" 
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Key className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{savedKey ? "LLM Active" : "LLM Key"}</span>
+              </button>
+
               <a
                 href="/Jishnudip%20Saha%20CV.pdf"
                 download
-                title="Download Jishnu's CV"
+                title="Download Jishnu's CV (PDF)"
                 className="p-1.5 rounded-lg text-gray-400 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5" />
@@ -400,8 +485,39 @@ export default function AICopilot() {
             </div>
           </div>
 
+          {/* Optional LLM Settings Drawer */}
+          {showSettings && (
+            <div className="p-3 bg-[#0f101f] border-b border-purple-500/30 text-xs font-mono space-y-2 shrink-0 animate-fade-in">
+              <div className="flex items-center justify-between text-white font-bold">
+                <span className="flex items-center gap-1.5 text-cyan-300">
+                  <Key className="w-3.5 h-3.5" />
+                  Connect Live LLM (Gemini / Groq)
+                </span>
+                <span className="text-[10px] text-gray-400 font-normal">Optional</span>
+              </div>
+              <p className="text-[10px] text-gray-300 leading-relaxed font-sans">
+                Paste your free <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline">Google Gemini API Key</a> or <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="text-purple-400 underline">Groq Key</a> to chat with Gemini 2.0 Flash in real-time. Stored securely in your browser.
+              </p>
+              <div className="flex items-center gap-1.5 pt-1">
+                <input
+                  type="password"
+                  value={customKey}
+                  onChange={(e) => setCustomKey(e.target.value)}
+                  placeholder="AIzaSy... or gsk_..."
+                  className="flex-1 bg-black/50 border border-white/20 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 placeholder-gray-600 font-mono"
+                />
+                <button
+                  onClick={saveApiKey}
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-mono text-[11px] font-bold hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+                >
+                  {keySaveMessage ? "Saved!" : "Save"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Profile Identity Bar */}
-          <div className="px-4 py-3 bg-gradient-to-r from-purple-950/40 via-[#0a0a14] to-cyan-950/40 border-b border-white/5 flex items-center justify-between">
+          <div className="px-4 py-3 bg-gradient-to-r from-purple-950/50 via-[#0a0a14] to-cyan-950/40 border-b border-white/5 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative shrink-0">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 shadow-glow-purple">
@@ -428,12 +544,12 @@ export default function AICopilot() {
 
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Available for Internships
+              Internship Ready
             </span>
           </div>
 
-          {/* Messages Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+          {/* Messages Scroll Area (Flexible Height) */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs min-h-0">
             {messages.map((msg) => {
               const isUser = msg.role === "user"
               const isSourceExpanded = expandedSources[msg.id]
@@ -463,7 +579,7 @@ export default function AICopilot() {
                       className={`rounded-2xl p-3.5 ${
                         isUser
                           ? "bg-gradient-to-r from-purple-600/50 to-indigo-600/50 border border-purple-500/30 text-white rounded-tr-none shadow-md"
-                          : "glass-card border border-white/10 text-gray-200 rounded-tl-none shadow-md"
+                          : "bg-white/[0.04] border border-white/10 text-gray-200 rounded-tl-none shadow-md"
                       }`}
                     >
                       {isUser ? (
@@ -492,7 +608,7 @@ export default function AICopilot() {
                               {msg.sources.map((s) => (
                                 <div
                                   key={s.id}
-                                  className="p-2 rounded-lg bg-black/40 border border-white/5 text-[10px] font-mono text-gray-400"
+                                  className="p-2 rounded-lg bg-black/50 border border-white/5 text-[10px] font-mono text-gray-400"
                                 >
                                   <div className="text-cyan-300 font-semibold flex items-center justify-between">
                                     <span>{s.title}</span>
@@ -518,6 +634,15 @@ export default function AICopilot() {
 
                     <div className="flex items-center gap-2 mt-1 px-1 text-[10px] font-mono text-gray-500">
                       <span>{msg.timestamp}</span>
+                      {!isUser && msg.modelUsed && (
+                        <span className="text-[9px] text-cyan-400/80">
+                          {msg.modelUsed.includes("gemini")
+                            ? "✨ Gemini LLM"
+                            : msg.modelUsed.includes("groq")
+                            ? "⚡ Groq Llama"
+                            : "⚡ RAG"}
+                        </span>
+                      )}
                       {!isUser && (
                         <button
                           onClick={() => copyAnswer(msg.content, msg.id)}
@@ -547,7 +672,7 @@ export default function AICopilot() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="glass-card border border-white/10 rounded-2xl rounded-tl-none p-3 text-xs font-mono text-cyan-400 flex items-center gap-2">
+                <div className="bg-white/[0.04] border border-white/10 rounded-2xl rounded-tl-none p-3 text-xs font-mono text-cyan-400 flex items-center gap-2">
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" />
                     <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce [animation-delay:0.2s]" />
@@ -561,27 +686,27 @@ export default function AICopilot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompts Chips */}
-          <div className="px-3 py-2 bg-black/30 border-t border-white/5 overflow-x-auto flex gap-1.5 scrollbar-none">
+          {/* Quick Prompts Chips (Horizontally scrollable) */}
+          <div className="px-3 py-2 bg-black/40 border-t border-white/5 overflow-x-auto flex gap-1.5 scrollbar-none shrink-0">
             {suggestedPrompts.map((prompt) => (
               <button
                 key={prompt}
                 onClick={() => handleSend(prompt)}
                 disabled={loading}
-                className="whitespace-nowrap px-2.5 py-1 rounded-full glass-pill text-[10px] font-mono text-gray-300 hover:text-white hover:border-cyan-400/50 hover:bg-cyan-500/10 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-mono text-gray-300 hover:text-white hover:border-cyan-400/50 hover:bg-cyan-500/10 transition-all cursor-pointer disabled:opacity-50 shrink-0"
               >
                 {prompt}
               </button>
             ))}
           </div>
 
-          {/* Input Bar */}
+          {/* Input Bar (Firmly pinned at bottom of window) */}
           <form
             onSubmit={(e) => {
               e.preventDefault()
               handleSend()
             }}
-            className="p-3 bg-black/50 border-t border-white/10 flex items-center gap-2"
+            className="p-3 bg-black/60 border-t border-white/10 flex items-center gap-2 shrink-0"
           >
             <div className="relative flex-1 flex items-center bg-white/[0.03] border border-white/10 rounded-xl focus-within:border-cyan-400/60 transition-colors">
               <span className="text-cyan-400 font-mono text-xs pl-3 pr-1 select-none">&gt;</span>
@@ -605,7 +730,7 @@ export default function AICopilot() {
           </form>
 
           {/* Subtext info */}
-          <div className="px-4 py-1 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-gray-500">
+          <div className="px-4 py-1 bg-black/80 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-gray-500 shrink-0">
             <span>Press Enter to send</span>
             <span>⌘J or Esc to close</span>
           </div>

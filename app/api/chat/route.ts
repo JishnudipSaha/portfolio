@@ -4,7 +4,9 @@ import { processRAGQuery } from "@/lib/rag/engine"
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { message } = body
+    const { message, apiKey: bodyApiKey } = body
+    const headerApiKey = req.headers.get("x-llm-key") || req.headers.get("x-gemini-key")
+    const activeKey = (typeof bodyApiKey === "string" && bodyApiKey.trim()) || headerApiKey || undefined
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return NextResponse.json(
@@ -13,14 +15,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (message.length > 500) {
+    if (message.length > 800) {
       return NextResponse.json(
-        { error: "Query exceeds maximum length of 500 characters." },
+        { error: "Query exceeds maximum length of 800 characters." },
         { status: 400 }
       )
     }
 
-    const result = await processRAGQuery(message.trim())
+    const result = await processRAGQuery(message.trim(), activeKey)
 
     return NextResponse.json(result, {
       status: 200,
