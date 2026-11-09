@@ -155,6 +155,25 @@ function synthesizeLocalAnswer(query: string, retrieved: RAGRetrievalResult[]): 
   const top = retrieved[0].chunk
 
   // Specialized synthesis based on query intent
+  if (
+    queryLower.includes("about yourself") ||
+    queryLower.includes("about you") ||
+    queryLower.includes("who are you") ||
+    queryLower.includes("introduce yourself") ||
+    queryLower.includes("introduction") ||
+    queryLower.includes("who is jishnu") ||
+    queryLower.includes("tell me about yourself") ||
+    queryLower.includes("who jishnu")
+  ) {
+    return `Hey! 👋 I'm **Jishnudip Saha**, a 3rd-year Data Science undergraduate at **Narula Institute of Technology** (graduating in 2027) based in Kolkata, India.\n\n` +
+      `I love turning data and ideas into intelligent, production-ready software. Here is a quick snapshot of who I am and what I do:\n\n` +
+      `* **🎓 Academic Focus:** B.Tech in Computer Science & Engineering (Data Science) specializing in predictive neural models, algorithms, and distributed systems.\n` +
+      `* **⚡ Core Stack:** Python (TensorFlow, Scikit-learn, Pandas, NumPy), TypeScript, Next.js 16, React 19, Java (HackerRank 5-Star Gold Medal), and SQL.\n` +
+      `* **🚀 Highlighted Projects:** Content-based [Movie Recommender](https://jishnudip-mrs-project-tmdb.streamlit.app/), [Titanic Survival Classifier](https://codsoft-project-titanic.streamlit.app/), and Retinal Eye Disease CNN.\n` +
+      `* **💼 Current Status:** I am **actively seeking Software Engineering and Data Science internships** (open to remote & on-site).\n\n` +
+      `👉 Feel free to check out my [Projects Showcase](/projects), download my [Resume](/Jishnudip%20Saha%20CV.pdf), or email me directly at [jishnudip.saha.2004@gmail.com](mailto:jishnudip.saha.2004@gmail.com)!`
+  }
+
   if (queryLower.includes("skill") || queryLower.includes("tech") || queryLower.includes("stack") || queryLower.includes("language")) {
     const skillChunks = retrieved.filter((r) => r.chunk.category === "skills")
     const chunks = skillChunks.length > 0 ? skillChunks.map((r) => r.chunk) : retrieved.map((r) => r.chunk)
